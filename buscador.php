@@ -1,3 +1,6 @@
+<?php
+  session_start();
+?>
 <!doctype html>
 <html lang="en">
   <head>
@@ -8,6 +11,7 @@
     <link rel="stylesheet" href="publicacionesEstilo.css">
   </head>
   <body>
+
     <nav class="navbar bg-body-tertiary">
       <div class="container-fluid">
         <a class="navbar-brand" href="#">
@@ -16,68 +20,97 @@
         </a>
           <form class="d-flex" role="search">
             <input class="form-control me-2" type="search" placeholder="Buscar publicacion" aria-label="Buscar publicacion">
-            <button class="btn btn-outline-success" type="submit">Buscar</button>
+            <button class="btn btn-outline-success" type="submit" name="filtro">Buscar</button>
           </form>
       </div>
     </nav>
-
+    <!--Buscador-->
     <br><br>
       <div class="container" align="center">
-        <form action="">
-          Origen: <input type="text" name="origen" id="origen">
-          Destino: <input type="text" name="destino" id="destino">
-          Peso: <input type="number" name="peso" id="peso">  
-          <input class="btn btn-primary" type="submit" value="Buscar">
+        <form action="buscador.php" method="get">
+          <!--Origenr-->
+          Origen: <select name="origen" id="origen">
+                    <option value="*">Cualquiera</option>
+                    <?php
+                      include 'coneccion/conexionDB.php';
+
+                      $sql = "SELECT * FROM argentina";
+                      $resultado=mysqli_query($conn,$sql);
+                      if(mysqli_num_rows($resultado)>0){
+                        while($row=mysqli_fetch_row($resultado)){
+                          echo "<option value='".$row[0]."'>".$row[1]."</option>";
+                        }
+                      }
+                      
+                    ?>
+                  </select>
+          <!--Destino-->              
+          Destino: <select name="destino" id="destino">
+                    <option value="*">Cualquiera</option>
+                    <?php
+                      $sql = "SELECT * FROM argentina";
+                      $resultado=mysqli_query($conn,$sql);
+                      if(mysqli_num_rows($resultado)>0){
+                        while($row=mysqli_fetch_row($resultado)){
+                          echo "<option value='".$row[0]."'>".$row[1]."</option>";
+                        }
+                      }
+                      include 'coneccion/cerrarConexion.php';
+                    ?>
+                  </select>
+          <!--Peso: <input type="number" name="peso" id="peso">-->  
+          <input class="btn btn-primary" type="submit" value="Buscar" name="buscar">
         </form>
       </div>
 
       <br><br>
+      <!--Publicaciones-->
+      
+      <?php
+        include 'coneccion/conexionDB.php';
+        extract($_GET);
+        //si no se ha apretado el boton de busqueda arranca aqui y muestra todo
+        if(!isset($buscar)){
+        $sql="SELECT * FROM publicacion";
+        //inserta echoPublicaciones que contiene las consultas SQL para imprimir las publicaciones
+        include 'echoPublicaciones.php';
+      }else{
+        //Si se ha apretado el boton de busqueda ejecuta lo siguiente
+        if($origen!="*"&&$destino=="*"){
+          $sql= "SELECT * FROM publicacion WHERE pu_fk_origen=".$origen;
+          include 'echoPublicaciones.php';
+        }
+        if($origen=="*"&&$destino!="*"){
+          $sql= "SELECT * FROM publicacion WHERE pu_fk_destino=".$destino;
+          include 'echoPublicaciones.php';
+        }
+        if($origen!="*"&&$destino!="*"){
+          $sql= "SELECT * FROM publicacion WHERE pu_fk_destino=".$destino AND "pu_fk_origen=".$origen;
+          include 'echoPublicaciones.php';
+        }
+        if($origen==="*"&&$destino==="*"){
+          $sql="SELECT * FROM publicacion";
+          include 'echoPublicaciones.php';
+        }
+      }
+        include 'coneccion/cerrarConexion.php';
+      ?>
       <div class="container" align="center">
+        
 
-        <div class="card mb-3 col-md-12" style="max-width: 720px;" align="center">
-          <div class="row g-0">
-            <div class="col-md-4">
-              <img src="depositphotos_11506024-stock-photo-package.jpg" class="img-fluid rounded-start" alt="...">
-            </div>
-            <div class="col-md-8">
-              <div class="card-body">
-                <h5 class="card-title">Nombre de publicacion</h5>
-                <p class="card-text">Detalles de la publicacion.......</p>
-                <small class="text-body-secondary"><strong>Origen</strong>: ----</small> <small class="text-body-secondary"><strong>Destino</strong>: ----</small><br><br>
-                <a href=""><button class="btn btn-primary">Ver detalles</button></a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="card mb-3 col-md-12" style="max-width: 720px;">
-          <div class="row g-0">
-            <div class="col-md-4">
-              <img src="depositphotos_11506024-stock-photo-package.jpg" class="img-fluid rounded-start" alt="...">
-            </div>
-            <div class="col-md-8">
-              <div class="card-body">
-                <h5 class="card-title">Nombre de publicacion</h5>
-                <p class="card-text">Detalles de la publicacion.......</p>
-                <small class="text-body-secondary"><strong>Origen</strong>: ----</small> <small class="text-body-secondary"><strong>Destino</strong>: ----</small><br><br>
-                <a href=""><button class="btn btn-primary">Ver detalles</button></a>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="card mb-3 col-md-12" style="max-width: 720px;">
-          <div class="row g-0">
-            <div class="col-md-4">
-              <img src="depositphotos_11506024-stock-photo-package.jpg" class="img-fluid rounded-start" alt="...">
-            </div>
-            <div class="col-md-8">
-              <div class="card-body">
-                <h5 class="card-title">Nombre de publicacion</h5>
-                <p class="card-text">Detalles de la publicacion.......</p>
-                <small class="text-body-secondary"><strong>Origen</strong>: ----</small> <small class="text-body-secondary"><strong>Destino</strong>: ----</small><br><br>
-                <a href=""><button class="btn btn-primary">Ver detalles</button></a>
-              </div>
-            </div>
-        </div>
+
+        <!--Paginacion-->
+        <ul class="pagination justify-content-end">
+          <li class="page-item disabled">
+            <a class="page-link">Previous</a>
+          </li>
+          <li class="page-item"><a class="page-link" href="#">1</a></li>
+          <li class="page-item"><a class="page-link" href="#">2</a></li>
+          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item">
+            <a class="page-link" href="#">Next</a>
+          </li>
+        </ul>
 
       </div>
     </div>
