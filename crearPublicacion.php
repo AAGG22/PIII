@@ -10,58 +10,38 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
   </head>
   <body>
-  <nav class="navbar bg-body-tertiary">
-        <div class="container-fluid">
-          <a class="navbar-brand" href="#">
-            <img src="https://cdn.pixabay.com/photo/2016/04/22/17/36/wooden-v-1346205_1280.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
-            VeryDeli
-          </a>
-            <form class="d-flex" role="search">
-              <input class="form-control me-2" type="search" placeholder="Buscar publicacion" aria-label="Buscar publicacion">
-              <button class="btn btn-outline-success" type="submit">Buscar</button>
-            </form>
-        </div>
-    </nav>
+  
+<?php
+include('cabecera.php');
+?>
+
         <div class="card container" style='width:750px'>
         <div class="card-header" align="center" style='background-color: lightblue;'>
             <strong>Crear Publicacion</strong>
         </div>
         <div class="card-body">
-        <div class="container">
-        <form>
+        <div class="container ">
+            
+        <form action="subirPublicacion.php" method="post" enctype="multipart/form-data">
             <div class="form-row">
             <div class="form-group col-md-6">
-                    <label for="Origen">Titulo:</label>
+                    <label for="titulo">Titulo:</label>
                     <input type="text" class="form-control" id="titulo" name="titulo">
                 </div>
                 <div class="form-group col-md-6">
-                    <label for="Origen">Origen:</label>
+                    <label for="origen">Origen:</label>
                     <input type="text" class="form-control" id="origen" name="origen">
                 </div>
                 <div class="form-group col-md-6">
                     <label for="destino">Destino:</label>
-                    <input type="text" class="form-control" id="destino" name="descripcion">
+                    <input type="text" class="form-control" id="destino" name="destino">
                 </div>
-                <div class="form-group col-md-6">
-                    <label for="destino">Localidad:</label>
-                    <input type="text" class="form-control" id="localidad" name="localidad">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="destino">Barrio:</label>
-                    <input type="text" class="form-control" id="barrio" name="barrio">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="destino">Direccion:</label>
-                    <input type="text" class="form-control" id="direccion" name="direccion">
-                </div>
+                
                 <div class="form-group col-md-6">
                     <label for="descripcion">Descripcion:</label>
                     <input type="text" class="form-control" id="descripcion" name="descripcion">
                 </div>
-                <div class="form-group col-md-6">
-                    <label for="Origen">Comentario:</label>
-                    <input type="text" class="form-control" id="comentario" name="comentario">
-                </div>
+                
             </div>
             
             <div class="form-row">
@@ -88,6 +68,11 @@
         </div>
         </div>
     </div>
+
+<?php
+include('pie.php');
+?>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>
 </html>
