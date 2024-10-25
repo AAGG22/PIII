@@ -1,5 +1,5 @@
 <?php
-require_once 'conexion.php';
+include ('conexion.php');
 
 // Función para validar el nombre y apellido
 function validarNombre($cadena) {
@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userName = trim($_POST['userName']);
     $pwd = $_POST['pwd'];
     $email = trim($_POST['email']);
-    $vehiculo = trim($_POST['vehiculo']);
+    $avatar=1;
 
     // Validaciones
 
@@ -48,9 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     
 
-    if (empty($vehiculo)) {
-        $errors[] = "El campo vehículo es obligatorio.";
-    }
+    
 
     // Si no hay errores, insertar el usuario en la base de datos
     if (empty($errors)) {
@@ -59,8 +57,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $hashed_pwd = password_hash($pwd, PASSWORD_BCRYPT);
 
             // Preparar la consulta SQL
-            $sql = "INSERT INTO usuario (u_nombre, u_apellido, u_userName, u_pwd, u_email, u_vehiculo) 
-                    VALUES (:nombre, :apellido, :userName, :pwd, :email, :vehiculo)";
+            $sql = "INSERT INTO usuario (u_nombre, u_apellido, u_userName, u_pwd, u_email, u_avatar) 
+                    VALUES (:nombre, :apellido, :userName, :pwd, :email, :avatar)";
             
             // Preparar la declaración
             $stmt = $pdo->prepare($sql);
@@ -71,11 +69,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $stmt->bindParam(':userName', $userName);
             $stmt->bindParam(':pwd', $hashed_pwd);
             $stmt->bindParam(':email', $email);
-            $stmt->bindParam(':vehiculo', $vehiculo);
+            $stmt->bindParam(':avatar', $avatar); //por defecto le pongo foto User
 
             // Ejecutar la consulta
             if ($stmt->execute()) {
-                header("Location: pag4.php");
+                header("Location: index.php");
             } else {
                 echo "Error al guardar el usuario.";
             }
