@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Servidor: 127.0.0.1
--- Tiempo de generación: 25-10-2024 a las 04:27:06
+-- Tiempo de generación: 25-10-2024 a las 19:21:59
 -- Versión del servidor: 10.4.32-MariaDB
 -- Versión de PHP: 8.2.12
 
@@ -20,6 +20,118 @@ SET time_zone = "+00:00";
 --
 -- Base de datos: `verydeli`
 --
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `argentina`
+--
+
+CREATE TABLE `argentina` (
+  `arg_id` int(11) NOT NULL,
+  `provincia` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `argentina`
+--
+
+INSERT INTO `argentina` (`arg_id`, `provincia`) VALUES
+(1, 'Bs.As(CABA)'),
+(2, 'Buenos Aires'),
+(3, 'Catamarca'),
+(4, 'Chaco'),
+(5, 'Chubut'),
+(6, 'Córdoba'),
+(7, 'Corrientes'),
+(8, 'Entre Ríos'),
+(9, 'Formosa'),
+(10, 'Jujuy'),
+(11, 'La Pampa'),
+(12, 'La Rioja'),
+(13, 'Mendoza'),
+(14, 'Misiones'),
+(15, 'Neuquén'),
+(16, 'Río Negro'),
+(17, 'Salta'),
+(18, 'San Juan'),
+(19, 'San Luis'),
+(20, 'Santa Cruz'),
+(21, 'Santa Fe'),
+(22, 'Santiago del Estero'),
+(23, 'Tierra del Fuego, Antártida e '),
+(24, 'Tucumán');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `avatar`
+--
+
+CREATE TABLE `avatar` (
+  `a_id` int(11) NOT NULL,
+  `a_url` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `avatar`
+--
+
+INSERT INTO `avatar` (`a_id`, `a_url`) VALUES
+(1, 'Imagenes/avatarUsuario.png'),
+(2, 'Imagenes/avatarLobo.png'),
+(3, 'Imagenes/avatarAbeja.jpg'),
+(4, 'Imagenes/avatarBufon.jpg'),
+(5, 'Imagenes/avatarDama.jpg'),
+(6, 'Imagenes/avatarHombreBarba.png'),
+(7, 'Imagenes/avatarPulpo.jpg');
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `postulacion`
+--
+
+CREATE TABLE `postulacion` (
+  `po_id` int(11) NOT NULL,
+  `po_fk_pu_id` int(11) NOT NULL,
+  `po_fk_u_id` int(11) NOT NULL,
+  `po_monto` int(50) NOT NULL,
+  `po_comentario` varchar(500) NOT NULL,
+  `po_califcacion` int(2) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `publicacion`
+--
+
+CREATE TABLE `publicacion` (
+  `pu_id` int(11) NOT NULL,
+  `pu_fk_u_id` int(11) NOT NULL,
+  `pu_publicacion` varchar(200) NOT NULL,
+  `pu_fk_origen` int(11) NOT NULL,
+  `pu_fk_destino` int(11) NOT NULL,
+  `pu_volumen` int(10) NOT NULL,
+  `pu_peso` int(10) NOT NULL,
+  `pu_descripcion` varchar(300) NOT NULL,
+  `pu_comentario` varchar(500) NOT NULL,
+  `pu_califcacion` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Volcado de datos para la tabla `publicacion`
+--
+
+INSERT INTO `publicacion` (`pu_id`, `pu_fk_u_id`, `pu_publicacion`, `pu_fk_origen`, `pu_fk_destino`, `pu_volumen`, `pu_peso`, `pu_descripcion`, `pu_comentario`, `pu_califcacion`) VALUES
+(1, 14, '', 1, 19, 20, 30, 'caja carton', 'llevar lo antes posible', 0),
+(2, 14, '', 1, 19, 20, 30, 'llll', 'llll', 8),
+(3, 15, '', 19, 13, 99, 40, 'excelente estado, es fragil', 'metele que es para ayer', 9),
+(4, 16, '', 19, 6, 20, 10, 'jardinería', 'tratar con cuidado', 10),
+(5, 15, '', 19, 13, 60, 7, 'electodomestico', 'no mojar', 7),
+(6, 15, '', 19, 6, 4, 3, 'paquete pequeño', 'no ocupa espacio', 0),
+(7, 15, '', 19, 6, 5, 3, 'paquete pequeño', 'no ocupa espacio', 5);
 
 -- --------------------------------------------------------
 
@@ -58,11 +170,25 @@ INSERT INTO `usuario` (`u_id`, `u_nombre`, `u_apellido`, `u_userName`, `u_pwd`, 
 (23, 'angela', 'viluron', 'angelaviluron', '$2y$10$h0lfOLZPI0wmZsNeSGnwSu8w5x/4YT1CBo9kgdXcZ0wGRVyzknz2W', 'angelaagustina04@gmail.com', 'toyota', NULL, 0, 'Rivadavia 300', 4),
 (24, 'juan', 'gomez', 'juanGomez', '$2y$10$X5YunCoA.S8SY4zMwaEAeOMGYQSdFr.MP7PM2rZ1xIGlbRaskQNdq', 'jgomez@gmail.com', 'Hilux', NULL, 0, '', 1),
 (34, 'jazmin', 'sosa', 'jsosa', '$2y$10$iYyOoKoi3RgIsdokho6TWu17q4UAkvzZPyZ2Z59vBa2COBo8fQqom', 'jsosa@gmail.com', 'kkkk', NULL, 0, '', 1),
-(35, 'martin', 'torres', 'mtorres', '$2y$10$25vGkVRRwnCEWiXf6uITu.254INYm51OyF6DZuLBsw2Z7/wjfeooG', 'mtorres@gmail.com', 'lll', NULL, 0, 'San Luis 455', 6);
+(35, 'martin', 'torres', 'mtorres', '$2y$10$25vGkVRRwnCEWiXf6uITu.254INYm51OyF6DZuLBsw2Z7/wjfeooG', 'mtorres@das', 'lll', NULL, 2147483647, 'San Luis 455', 6),
+(36, 'lola', 'perez', 'lperez', '$2y$10$x8UL6b7fTC72IujXMpRp9ebk2eI.Tf4dRoUmOR1BxYKfAYtQmAVFS', 'lperez@gmail.com', NULL, NULL, NULL, NULL, 1),
+(37, 'jose', 'suarez', 'jsuarez', '$2y$10$yZ7FEmHylj15QGzrhcX1E.3JA6QIzV00tJ6X0sVEC4hqBHmnxqXcm', 'jsuarez@gmail.com', 'sssss', NULL, 262254893, 'djsn', 6);
 
 --
 -- Índices para tablas volcadas
 --
+
+--
+-- Indices de la tabla `argentina`
+--
+ALTER TABLE `argentina`
+  ADD PRIMARY KEY (`arg_id`);
+
+--
+-- Indices de la tabla `avatar`
+--
+ALTER TABLE `avatar`
+  ADD PRIMARY KEY (`a_id`);
 
 --
 -- Indices de la tabla `usuario`
@@ -76,10 +202,22 @@ ALTER TABLE `usuario`
 --
 
 --
+-- AUTO_INCREMENT de la tabla `argentina`
+--
+ALTER TABLE `argentina`
+  MODIFY `arg_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+
+--
+-- AUTO_INCREMENT de la tabla `avatar`
+--
+ALTER TABLE `avatar`
+  MODIFY `a_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+
+--
 -- AUTO_INCREMENT de la tabla `usuario`
 --
 ALTER TABLE `usuario`
-  MODIFY `u_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
+  MODIFY `u_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 
 --
 -- Restricciones para tablas volcadas
