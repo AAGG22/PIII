@@ -38,7 +38,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 exit();
             } else {
                 // Contraseña incorrecta
-                echo "<div class='alert alert-danger'>Contraseña incorrecta.</div>";
+                //echo "<div class='alert alert-danger'>Contraseña incorrecta.</div>";
+                header("Location: pag2.php");
             }
         } else {
             // Usuario no encontrado
@@ -47,7 +48,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } else {
         // Campos vacíos
-        echo "<div class='alert alert-danger'>Por favor, complete todos los campos.</div>";
+        //echo "<div class='alert alert-danger'>Por favor, complete todos los campos.</div>";
+        
+        header("Location: pag2.php");
+                exit();
     }
 }
 ?>
