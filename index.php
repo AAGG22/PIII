@@ -1,118 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VeryDeli</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="estilo.css">
-</head>
+
 <body>
     <!-- Contenido de todo el index-->
 <div class="container-fluid" id="contenido">
 
 
-    <!-- BarraNavegacion-->
+<?php
+include ('cabecera.php');
+include('header.php');
 
-<nav class="navbar navbar-expand-lg bg-body-tertiary container-fluid d-flex justify-content-between align-items-center" id="navBar">
-  <div class="container-fluid d-flex justify-content-between align-items-center">
-    <a class="navbar-brand d-flex align-items-center" href="#">
-      <img src="Imagenes/logoVeryDeli.png" alt="Logo" width="50" height="50" class="d-inline-block align-text-top">
-      <span class="ms-2">VeryDeli</span>
+?>
+
+<div class="row d-flex justify-content-center align-items-center my-3">
+  <div class="col-auto">
+  <a class="btn-publicar" href="crearPublicacion.php">
+        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="white" class="bi bi-plus-square-fill" viewBox="0 0 16 16">
+            <path d="M2 0a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V2a2 2 0 0 0-2-2zm6.5 4.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3a.5.5 0 0 1 1 0"/>
+        </svg>
+        Publicar
     </a>
+    
+  </div>
 
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
+  <div class="col-12 col-sm-8 col-md-6 d-none d-sm-flex justify-content-center">
+    <select class="form-select me-2" id="origen" name="origen">
+      <option value="*"> Origen</option>
+      <option value="1">Origen 1</option>
+      <option value="2">Origen 2</option>
+    </select>
+
+    <select class="form-select me-2" id="destino" name="destino">
+      <option value="*"> Destino</option>
+      <option value="1">Destino 1</option>
+      <option value="2">Destino 2</option>
+    </select>
+
+    <input type="text" class="form-control me-2" id="peso" name="peso" placeholder="Ingrese peso">
+    
+    <button type="button" class="btn btnConfirmar">Filtrar</button>
+  </div>
+
+  <div class="col-12 d-sm-none">
+    <button class="btn btn-toggle w-100" data-bs-toggle="collapse" data-bs-target="#filterMenu" aria-expanded="false" aria-controls="filterMenu">
+      Filtros
     </button>
+    <div class="collapse" id="filterMenu">
+      <select class="form-select my-2" id="origen-mobile" name="origen">
+        <option value="*"> Origen</option>
+        <option value="1">Origen 1</option>
+        <option value="2">Origen 2</option>
+      </select>
 
-    <div class="collapse navbar-collapse ms-3" id="navbarScroll">
-      <form class="d-flex me-auto" role="search" id="buscar">
-        <input class="form-control me-2" type="search" placeholder="Buscar publicación" aria-label="Buscar publicación" id="barraBusqueda">
-        <button class="btn btn-outline-success" type="submit">Buscar</button>
-      </form>
+      <select class="form-select my-2" id="destino-mobile" name="destino">
+        <option value="*"> Destino</option>
+        <option value="1">Destino 1</option>
+        <option value="2">Destino 2</option>
+      </select>
 
-      <ul class="navbar-nav ms-auto my-2 my-lg-0" style="--bs-scroll-height: 100px;">
-        <li class="nav-item">
-          <a class="nav-link" aria-current="page" href="#">Iniciar sesión</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Registrarse</a>
-        </li>
-      </ul>
+      <input type="text" class="form-control my-2" id="peso-mobile" name="peso" placeholder="Ingrese peso">
+      
+      <button type="button" class="btn btnConfirmar w-100">Filtrar</button>
     </div>
   </div>
-</nav>
+</div>
 
 
+  
     <!-- publicacionesDestacadas(3 de usuarios mejores puntuados)-->
 
-  <div id="pubDestacadas" class="container-fluid">
+    <div class="row d-flex justify-content-center align-items-center">
+    <?php
+require 'conexion.php'; 
 
-  <div class="row justify-content-center m-4">
+try {
+    $query = "SELECT *
+              FROM publicacion
+              ORDER BY pu_id DESC
+              LIMIT 4";
     
-  <div class="container-fluid">
-  <div class="row">
-    <div class="card col-lg-3 col-md-4 col-12 mx-3 mb-3"> 
-      <div class="card-body container">
-        <div class="row align-items-center">
-          <div class="col-3">
-            <img src="https://cdn-icons-png.flaticon.com/512/4792/4792929.png" alt="" class="card-img-left" style="width:50px; height: auto; object-fit: cover;">
-          </div>
-          <div class="col-8 d-flex">
-            <h5 class="card-title text-center">Titulo</h5>
-          </div>
-        </div>
-        <p class="card-text">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptas fugiat dolorem quidem inventore minus! Optio sunt molestiae vero in eos?</p>
-        <a href="#" class="btn btn-info">Postularme</a>
-      </div>
-    </div>
-
-    <div class="card col-lg-3 col-md-4 col-12 mx-3 mb-3">
-      <div class="card-body container">
-        <div class="row align-items-center">
-          <div class="col-3">
-            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg-k4aMIE4Y-ok7X2N5kFvquh3K9scHC9D0wlcv4t_KDhRChwrlX7DVxzOHLd3_Kz5un4&usqp=CAU" alt="" class="card-img-left" style="width:50px; height: auto; object-fit: cover;">
-          </div>
-          <div class="col-8 d-flex">
-            <h5 class="card-title text-center">Titulo</h5>
-          </div>
-        </div>
-        <p class="card-text">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptas fugiat dolorem quidem inventore minus! Optio sunt molestiae vero in eos?</p>
-        <a href="#" class="btn btn-info">Postularme</a>
-      </div>
-    </div>
-
-    <div class="card col-lg-3 col-md-4 col-12 mx-3 mb-3">
-      <div class="card-body container">
-        <div class="row align-items-center">
-          <div class="col-3">
-            <img src="https://cdn-icons-png.flaticon.com/512/4792/4792929.png" alt="" class="card-img-left" style="width:50px; height: auto; object-fit: cover;">
-          </div>
-          <div class="col-8 d-flex">
-            <h5 class="card-title text-center">Titulo</h5>
-          </div>
-        </div>
-        <p class="card-text">Lorem ipsum dolor, sit amet consectetur adipisicing elit. Voluptas fugiat dolorem quidem inventore minus! Optio sunt molestiae vero in eos?</p>
-        <a href="#" class="btn btn-info">Postularme</a>
-      </div>
-    </div>
-  </div>
-</div>
-
-
+    $stmt = $pdo->prepare($query);
+    $stmt->execute();
     
+    $publicaciones = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    if ($publicaciones) {
+        foreach ($publicaciones as $publicacion) {
+            //nombres de origen y destino 
+            $stmt_origen = $pdo->prepare("SELECT provincia FROM argentina WHERE arg_id = :origen_id");
+            $stmt_destino = $pdo->prepare("SELECT provincia FROM argentina WHERE arg_id = :destino_id");
+            
+            // nombre de origen
+            $stmt_origen->bindParam(':origen_id', $publicacion['pu_fk_origen'], PDO::PARAM_INT);
+            $stmt_origen->execute();
+            $origen = $stmt_origen->fetchColumn();
 
-  </div>
-</div>
+            // nombre del destino
+            $stmt_destino->bindParam(':destino_id', $publicacion['pu_fk_destino'], PDO::PARAM_INT);
+            $stmt_destino->execute();
+            $destino = $stmt_destino->fetchColumn();
+
+            ?>
+            <div class="col-12 col-md-6 col-lg-3 mb-1 d-flex justify-content-center">
+                <div class="card" style="width: 100%;"> 
+                    <img src="<?php echo $publicacion['pu_foto']; ?>" class="card-img-top" alt="...">
+                    <div class="card-body">
+                        <h5 class="card-title text-center">Publicación #<?php echo $publicacion['pu_id']; ?></h5>
+                        <p class="card-text text-center" style="font-size:12px">Origen: <?php echo $origen ? $origen : 'Desconocido'; ?> - Destino: <?php echo $destino ? $destino : 'Desconocido'; ?></p>
+                        <div class="d-flex justify-content-between"> 
+                        <a href="verPublicacion.php?id=<?php echo $publicacion['pu_id']; ?>" class="btn btn-outline-primary">Ver Más</a>
+
+                            <a href="Pag6_deposito.php" class="btn btn-outline-info">Postularse</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <?php
+        }
+    } else {
+        echo "No se encontraron publicaciones.";
+    }
+} catch (PDOException $e) {
+    echo "Error en la consulta: " . $e->getMessage();
+}
+// el pdo se cierra automáticamente al final del script.
+
+?>
+
+
+<!--Fin pubDestacadas-->
 
 
 
     <!-- publicacionesRecientes(ultimas 5)-->
-<div id="pubRecientes">
+<div id="pubRecientes" class="row d-flex justify-content-center align-items-center">
 
 
 <div class="card d-flex flex-row " style="height: 100%;">
-  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg-k4aMIE4Y-ok7X2N5kFvquh3K9scHC9D0wlcv4t_KDhRChwrlX7DVxzOHLd3_Kz5un4&usqp=CAU" alt="" class="card-img-left" style="width: 150px; height: auto; object-fit: cover;"> 
+  <img src="https://cdn.pixabay.com/photo/2015/12/22/04/00/photo-1103595_1280.png" alt="" class="card-img-left" style="width: 200px; height: auto; object-fit: cover;"> 
   <div class="card-body d-flex flex-column">
     <div class="flex-grow-1">
       <h5 class="card-title">Titulo</h5>
@@ -125,7 +150,7 @@
 </div>
 
 <div class="card d-flex flex-row " style="height: 100%;">
-  <img src="https://cdn-icons-png.flaticon.com/512/4792/4792929.png" alt="" class="card-img-left" style="width: 150px; height: auto; object-fit: cover;"> 
+  <img src="https://cdn.pixabay.com/photo/2015/12/22/04/00/photo-1103595_1280.png" alt="" class="card-img-left" style="width: 200px; height: auto; object-fit: cover;"> 
   <div class="card-body d-flex flex-column">
     <div class="flex-grow-1">
       <h5 class="card-title">Titulo</h5>
@@ -137,7 +162,7 @@
   </div>
 </div>
 <div class="card d-flex flex-row " style="height: 100%;">
-  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg-k4aMIE4Y-ok7X2N5kFvquh3K9scHC9D0wlcv4t_KDhRChwrlX7DVxzOHLd3_Kz5un4&usqp=CAU" alt="" class="card-img-left" style="width: 150px; height: auto; object-fit: cover;"> 
+  <img src="https://cdn.pixabay.com/photo/2015/12/22/04/00/photo-1103595_1280.png" alt="" class="card-img-left" style="width: 200px; height: auto; object-fit: cover;"> 
   <div class="card-body d-flex flex-column">
     <div class="flex-grow-1">
       <h5 class="card-title">Titulo</h5>
@@ -149,7 +174,7 @@
   </div>
 </div>
 <div class="card d-flex flex-row " style="height: 100%;">
-  <img src="https://cdn-icons-png.flaticon.com/512/4792/4792929.png" alt="" class="card-img-left" style="width: 150px; height: auto; object-fit: cover;"> 
+  <img src="https://cdn.pixabay.com/photo/2015/12/22/04/00/photo-1103595_1280.png" alt="" class="card-img-left" style="width: 200px; height: auto; object-fit: cover;"> 
   <div class="card-body d-flex flex-column">
     <div class="flex-grow-1">
       <h5 class="card-title">Titulo</h5>
@@ -161,7 +186,7 @@
   </div>
 </div>
 <div class="card d-flex flex-row " style="height: 50%;">
-  <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSg-k4aMIE4Y-ok7X2N5kFvquh3K9scHC9D0wlcv4t_KDhRChwrlX7DVxzOHLd3_Kz5un4&usqp=CAU" alt="" class="card-img-left" style="width: 150px; height: auto; object-fit: cover;"> 
+  <img src="https://cdn.pixabay.com/photo/2015/12/22/04/00/photo-1103595_1280.png" alt="" class="card-img-left" style="width: 200px; height: auto; object-fit: cover;"> 
   <div class="card-body d-flex flex-column">
     <div class="flex-grow-1">
       <h5 class="card-title">Titulo</h5>
@@ -177,22 +202,11 @@
 
 </div>
 
+<?php
+include('pie.php');
+?>
 
 </div>
-
-
-
-
-
-
-
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</body>
-</html>
-
-
-
 
 
 
@@ -200,6 +214,5 @@
 
 
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
 </body>
 </html>
