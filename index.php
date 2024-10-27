@@ -9,7 +9,7 @@
 <?php
 include ('cabecera.php');
 include('header.php');
-
+include ('postulacion.php');
 ?>
 
 <div class="row d-flex justify-content-center align-items-center my-3">
@@ -108,9 +108,11 @@ try {
                         <h5 class="card-title text-center">Publicación #<?php echo $publicacion['pu_id']; ?></h5>
                         <p class="card-text text-center" style="font-size:12px">Origen: <?php echo $origen ? $origen : 'Desconocido'; ?> - Destino: <?php echo $destino ? $destino : 'Desconocido'; ?></p>
                         <div class="d-flex justify-content-between"> 
-                        <a href="verPublicacion.php?id=<?php echo $publicacion['pu_id']; ?>" class="btn btn-outline-primary">Ver Más</a>
+                        <a href="publicacion.php?id=<?php echo $publicacion['pu_id']; ?>" class="btn btn-outline-primary">Ver Más</a>
 
-                            <a href="Pag6_deposito.php" class="btn btn-outline-info">Postularse</a>
+                        
+                                <a type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#exampleModal" href="postulacion.php">Postularse</a>
+                            
                         </div>
                     </div>
                 </div>
