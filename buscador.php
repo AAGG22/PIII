@@ -6,114 +6,118 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Bootstrap demo</title>
+    <title>Buscador VeryDeli</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="publicacionesEstilo.css">
   </head>
   <body>
-
-    <nav class="navbar bg-body-tertiary">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">
-          <img src="https://cdn.pixabay.com/photo/2016/04/22/17/36/wooden-v-1346205_1280.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
-          VeryDeli
-        </a>
-          <form class="d-flex" role="search">
-            <input class="form-control me-2" type="search" placeholder="Buscar publicacion" aria-label="Buscar publicacion">
-            <button class="btn btn-outline-success" type="submit" name="filtro">Buscar</button>
-          </form>
-      </div>
-    </nav>
-    <!--Buscador-->
+    <?php
+        include 'cabecera.html';
+    ?>
     <br><br>
-      <div class="container" align="center">
-        <form action="buscador.php" method="get">
-          <!--Origenr-->
-          Origen: <select name="origen" id="origen">
-                    <option value="*">Cualquiera</option>
-                    <?php
-                      include 'coneccion/conexionDB.php';
+    <!--Buscador-->
+    <div class="container" align="center">
+      <form action="buscador.php" method="get">
+        <!-- Origen -->
+        Provincia de origen: 
+        <select name="origen" id="origen">
+          <option value="*">Cualquiera</option>
+          <?php
+            include 'coneccion/conexionPDO.php';
+            $sql = "SELECT * FROM argentina";
+            $stmt = $pdo->query($sql);  // Ejecución de la consulta
+            $resultado = $stmt->fetchAll(PDO::FETCH_NUM);  // Obtener los resultados en formato numérico
 
-                      $sql = "SELECT * FROM argentina";
-                      $resultado=mysqli_query($conn,$sql);
-                      if(mysqli_num_rows($resultado)>0){
-                        while($row=mysqli_fetch_row($resultado)){
-                          echo "<option value='".$row[0]."'>".$row[1]."</option>";
-                        }
-                      }
-                      
-                    ?>
-                  </select>
-          <!--Destino-->              
-          Destino: <select name="destino" id="destino">
-                    <option value="*">Cualquiera</option>
-                    <?php
-                      $sql = "SELECT * FROM argentina";
-                      $resultado=mysqli_query($conn,$sql);
-                      if(mysqli_num_rows($resultado)>0){
-                        while($row=mysqli_fetch_row($resultado)){
-                          echo "<option value='".$row[0]."'>".$row[1]."</option>";
-                        }
-                      }
-                      include 'coneccion/cerrarConexion.php';
-                    ?>
-                  </select>
-          <!--Peso: <input type="number" name="peso" id="peso">-->  
-          <input class="btn btn-primary" type="submit" value="Buscar" name="buscar">
-        </form>
-      </div>
+            if ($resultado) {
+              foreach ($resultado as $row) {
+                echo "<option value='".$row[0]."'>".$row[1]."</option>";
+              }
+            }
+          ?>
+        </select>
 
-      <br><br>
-      <!--Publicaciones-->
-      
-      <?php
-        include 'coneccion/conexionDB.php';
-        extract($_GET);
-        //si no se ha apretado el boton de busqueda arranca aqui y muestra todo
-        if(!isset($buscar)){
-        $sql="SELECT * FROM publicacion";
-        //inserta echoPublicaciones que contiene las consultas SQL para imprimir las publicaciones
-        include 'echoPublicaciones.php';
-      }else{
-        //Si se ha apretado el boton de busqueda ejecuta lo siguiente
-        if($origen!="*"&&$destino=="*"){
-          $sql= "SELECT * FROM publicacion WHERE pu_fk_origen=".$origen;
-          include 'echoPublicaciones.php';
-        }
-        if($origen=="*"&&$destino!="*"){
-          $sql= "SELECT * FROM publicacion WHERE pu_fk_destino=".$destino;
-          include 'echoPublicaciones.php';
-        }
-        if($origen!="*"&&$destino!="*"){
-          $sql= "SELECT * FROM publicacion WHERE pu_fk_destino=".$destino AND "pu_fk_origen=".$origen;
-          include 'echoPublicaciones.php';
-        }
-        if($origen==="*"&&$destino==="*"){
-          $sql="SELECT * FROM publicacion";
-          include 'echoPublicaciones.php';
-        }
-      }
-        include 'coneccion/cerrarConexion.php';
-      ?>
-      <div class="container" align="center">
-        
+        <!-- Destino -->              
+        Provincia de destino: 
+        <select name="destino" id="destino">
+          <option value="*">Cualquiera</option>
+          <?php
+            $sql = "SELECT * FROM argentina";
+            $stmt = $pdo->query($sql);
+            $resultado = $stmt->fetchAll(PDO::FETCH_NUM);
 
-
-        <!--Paginacion-->
-        <ul class="pagination justify-content-end">
-          <li class="page-item disabled">
-            <a class="page-link">Previous</a>
-          </li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
-          <li class="page-item">
-            <a class="page-link" href="#">Next</a>
-          </li>
-        </ul>
-
-      </div>
+            if ($resultado) {
+              foreach ($resultado as $row) {
+                echo "<option value='".$row[0]."'>".$row[1]."</option>";
+              }
+            }
+          ?>
+        </select>
+        <!-- Peso --> 
+        Peso: 
+        <select name="peso" id="peso">
+          <option value="*">Todos</option>
+          <option value="15">Menos de 15kg</option>
+          <option value="16">Más de 15kg</option>      
+        </select>
+        <input class="btn btn-primary" type="submit" value="Buscar" name="buscar">
+      </form>
     </div>
+
+    <br><br>
+    <!--Publicaciones-->
+    <?php
+      
+
+      // Control de variables y sanitización
+      $origen = isset($_GET['origen']) && $_GET['origen'] !== '*' ? $_GET['origen'] : null;
+      $destino = isset($_GET['destino']) && $_GET['destino'] !== '*' ? $_GET['destino'] : null;
+      $peso = isset($_GET['peso']) && $_GET['peso'] !== "*" ? (int)$_GET['peso'] : "*";
+
+      if (!isset($_GET['buscar'])) {
+        
+          $sql = "SELECT * FROM publicacion";
+          $stmt = $pdo->query($sql);
+          $resultado = $stmt->fetchAll(PDO::FETCH_NUM);
+          include 'echoPublicaciones.php';
+
+      } else {
+
+          // Construcción de la consulta SQL con condiciones dinámicas
+          $sql = "SELECT * FROM publicacion WHERE 1=1";
+
+          // Uso de consultas preparadas para filtrar por origen, destino y peso
+          $params = [];
+
+          if ($origen !== null) {
+              $sql .= " AND pu_fk_origen_provincia = :origen";
+              $params[':origen'] = $origen;
+          }
+
+          if ($destino !== null) {
+              $sql .= " AND pu_fk_destino_provincia = :destino";
+              $params[':destino'] = $destino;
+          }
+
+          if ($peso !== "*") {
+            if ($peso == 15) {
+                $sql .= " AND pu_peso <= 15";
+            } elseif ($peso == 16) {
+                $sql .= " AND pu_peso > 15";
+            }
+        }
+
+          $stmt = $pdo->prepare($sql);  // Preparar la consulta
+          $stmt->execute($params);  // Ejecutar con los parámetros
+
+          $resultado = $stmt->fetchAll(PDO::FETCH_NUM);  // Obtener los resultados
+          include 'echoPublicaciones.php';
+      }
+
+      include 'coneccion/cerrarConexionPDO.php';
+
+      include 'pie.html';
+    ?>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
   </body>
 </html>
