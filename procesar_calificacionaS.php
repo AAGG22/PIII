@@ -57,21 +57,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // **Obtener las últimas calificaciones del solicitante**
         $sql_calificaciones = "
             SELECT calificacion 
-            FROM calificacion_asolicitante 
-            WHERE id_solicitante = ? 
+            FROM calificacion_asolicitante  
+            WHERE id_solicitante = ? AND calificacion > 0  -- Solo calificaciones mayores que 0--
             ORDER BY fecha DESC 
             LIMIT 5";
+            /* WHERE id_solicitante = ? 
+            AND (calificacion > 0 OR (calificacion = 0 AND contado_negativo = 0)) -- Excluir ya contabilizadas-- */
         $stmt_calificaciones = $conn->prepare($sql_calificaciones);
         $stmt_calificaciones->bind_param("s", $id_solicitante);
         $stmt_calificaciones->execute();
-        $result_calificaciones = $stmt_calificaciones->get_result();
+        $result_calificaciones = $stmt_calificaciones->get_result();//toma los resultados de la consulta(get_result)
 
         $calificaciones = [];
         while ($row = $result_calificaciones->fetch_assoc()) {
+           // if ($row['calificacion'] > 0) {  // Ignorar los ceros
             $calificaciones[] = $row['calificacion'];
+            //}
         }
 
-        // Calcular promedio de calificaciones del solicitante
+    // Calcular promedio de calificaciones del solicitante
         // Asignar el id_solicitante a id_usuario desde el principio
         $id_usuario = $id_solicitante; 
 
@@ -97,6 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // Si tiene menos de 3 calificaciones, no es responsable
             $responsable = 0;
         }
+
         // **Actualizar estado de responsabilidad del usuario**
         //var_dump($id_usuario);
         $sql_update = "UPDATE usuarios SET responsable = ? WHERE id_usuario = ?";
@@ -116,12 +121,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Consulta para obtener los id_solicitante de envios sin calificación
         $sql_penalizar = "
-            SELECT e.id_solicitante 
+            SELECT e.id_solicitante  
             FROM envio e 
             LEFT JOIN calificacion_asolicitante c ON e.id_envio = c.id_envio
-            WHERE e.fecha_envio <= ? AND c.calificacion = 0
-            
-        ";
+            WHERE e.fecha_envio <= ? AND (c.calificacion = 0 AND c.contado_negativo = 0)
+        ";// Solo contabiliza las que no han sido contabilizadas 
+
         //WHERE e.fecha_envio <= ? AND c.id_envio IS NULL
         $stmt_penalizar = $conn->prepare($sql_penalizar);
         $stmt_penalizar->bind_param("s", $fecha_limite);
@@ -133,6 +138,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 // Obtener id_solicitante del resultado
                 $id_solicitante = $row['id_solicitante'];
                 echo "Penalizando al solicitante con ID: $id_solicitante<br>";
+                 //-----------------------------------------------------------
+                // **Actualizar contado_negativo en calificacion_asolicitante para la calificación de 0**
+                 $sql_actualizar_contado = "
+                    UPDATE calificacion_asolicitante 
+                    SET contado_negativo = 1 
+                    WHERE id_solicitante = ? AND (calificacion = 0 AND contado_negativo = 0)
+                ";
+                $stmt_actualizar_contado = $conn->prepare($sql_actualizar_contado);
+                $stmt_actualizar_contado->bind_param("s", $id_solicitante);
+                $stmt_actualizar_contado->execute();
+                //------------------------------------------------------------------
 
                 // **Asignar el id_solicitante a id_usuario**
                 $id_usuario = $id_solicitante; // Asignar directamente aquí
@@ -147,6 +163,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $stmt_update_negativas->bind_param("s", $id_usuario);
                 $stmt_update_negativas->execute();
 
+                
                 // Verificar si el usuario pierde la responsabilidad
                 $sql_verificar_responsable = "
                     SELECT calificaciones_negativas 
