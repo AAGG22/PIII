@@ -1,17 +1,20 @@
 <?php
 include "cabecera.php";
+include('header.php');
+
 ?>
 
 <div class="container small" style="padding: 9px; font-size: 12px;">
-    <div class="row">
-        <div class="col-4"></div>
-        <div class="col-4">
+   
+    <div class="row justify-content-center">
+    <div class="col-11 col-lg-4">
             <br>
             <div class="card">
                 <div class="card-header text-center">Registrar Usuario</div>
                 <div class="card-body">
                     <!-- Formulario con validación de Bootstrap -->
-                    <form id="userForm" action="usuario2_logica.php" method="POST" class="needs-validation" novalidate>
+                    <form id="userForm" action="usuario_logica.php" method="POST" class="needs-validation" novalidate>
+
 
                         <!-- Nombre -->
                         <div class="mb-0">
@@ -60,6 +63,7 @@ include "cabecera.php";
                                 </ul>
                             </div>
                         </div>
+                        
 
                         <!-- Botón de Envío -->
                         <button class="btn btn-secondary btn-sm mb-0" type="submit">Guardar Usuario</button>
@@ -67,7 +71,6 @@ include "cabecera.php";
                 </div>
             </div>
         </div>
-        <div class="col-4"></div>
     </div>
 </div>
 
