@@ -1,24 +1,27 @@
-</div>
+<?php
+
+?>
+
 <!-- Footer -->
-<footer class="text-center text-white" style="background: linear-gradient(to bottom, dimgray, #333); padding-top: 60px; position: relative; bottom: 0; width: 100%;">
-    <div class="container">
+<footer class="text-center text-white" style="padding-top: 60px; position: relative; bottom: 0; width: 100%;" id="footer">
+    <div class="container-fluid">
         <!-- Personas -->
         <div class="row" style="font-size: 12px;">
             <div class="col-md-2"></div>
             <div class="col-md-2">
-                <img src="img/user2.png" class="rounded-circle" alt="Person 1" width="50" height="50">
-                <p class="mt-2">Virulón Angela</p>
+                <img src="Imagenes/user2.png" class="rounded-circle" alt="Person 1" width="50" height="50">
+                <p class="mt-2">Vilurón Angela</p>
             </div>
             <div class="col-md-2">
-                <img src="img/user2.png" class="rounded-circle" alt="Person 1" width="50" height="50">
+                <img src="Imagenes/user2.png" class="rounded-circle" alt="Person 1" width="50" height="50">
                 <p class="mt-2">Tolay Sabrina</p>
             </div>
             <div class="col-md-2">
-                <img src="img/user2.png" class="rounded-circle" alt="Person 1" width="50" height="50">
+                <img src="Imagenes/user2.png" class="rounded-circle" alt="Person 1" width="50" height="50">
                 <p class="mt-2">Villalobos Gabriel</p>
             </div>
             <div class="col-md-2">
-                <img src="img/user2.png" class="rounded-circle" alt="Person 1" width="50" height="50">
+                <img src="Imagenes/user2.png" class="rounded-circle" alt="Person 1" width="50" height="50">
                 <p class="mt-2">Galván Alfredo</p>
             </div>
             <div class="col-md-2"></div>
@@ -39,15 +42,10 @@
 
         <!-- Copyright -->
         <p style="font-size:12px; margin-top: 20px;">
-        <a href="index.php"><img src="img/logo.png" alt="Verydeli" width="65" height="18"></a>
-            Copyright &copy; <?php echo date("Y"); ?> - Todos los derechos reservados. Virulón - Tolay - Villalobos - Galván - (UNSL - TUW - Programación III)
+        <a href="index.php"><img src="Imagenes/logo.png" alt="Verydeli" width="65" height="18"></a>
+            Copyright &copy; <?php echo date("Y"); ?> - Todos los derechos reservados. Vilurón - Tolay - Villalobos - Galván - (UNSL - TUW - Programación III)
         </p>
     </div>
 </footer>
 
 
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-OERcA2vJnrGzUGlobp+Pc0og6yqUVMM5k5m23/QqI1DFj8yzG6KavPHb9rYIYFNV" crossorigin="anonymous"></script>
-</body>
-
-</html>
