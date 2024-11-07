@@ -4,10 +4,11 @@ session_start();
 //var_dump($_SESSION); // Esto te mostrará si las variables existen
 
 // Conectar a la base de datos
-$host = "localhost";  // Servidor de la base de datos
-$dbname = "calificacion";  // Nombre de la base de datos
-$username = "user_vuelos";  // Usuario de la base de datos
-$password = "030817Fs";  // Contraseña de la base de datos
+
+$host = 'localhost';
+$dbname = 'verydeli_verydeli';
+$username = 'root'; 
+$password = '';
 
 // Crear conexión
 $conn = new mysqli($host, $username, $password, $dbname);
@@ -18,13 +19,13 @@ if ($conn->connect_error) {
 }
 
 // Obtener el ID de envío
-$id_envio = isset($_GET['id_envio']) ? (int)$_GET['id_envio'] : 0;
+$id_envio = isset($_GET['env_id_envio']) ? (int)$_GET['env_id_envio'] : 0;
 
 // Obtener el ID de solicitante
 $id_solicitante = isset($_SESSION['id_solicitante']) ? $_SESSION['id_solicitante'] : 0;
 
 // Obtener el ID de publicación a partir del ID de envío
-$sql_publicacion = "SELECT id_publicacion, id_solicitante, id_postulante FROM envio WHERE id_envio = ?";
+$sql_publicacion = "SELECT env_id_publicacion, env_id_solicitante, env_id_postulante FROM envio WHERE env_id_envio = ?";
 $stmt_publicacion = $conn->prepare($sql_publicacion);
 $stmt_publicacion->bind_param("i", $id_envio);
 $stmt_publicacion->execute();
@@ -32,21 +33,21 @@ $result_publicacion = $stmt_publicacion->get_result();
 
 if ($result_publicacion->num_rows > 0) {
     $data = $result_publicacion->fetch_assoc();
-    $id_publicacion = $data['id_publicacion'];
-    $id_solicitante = $data['id_solicitante'];
-    $id_postulante = $data['id_postulante'];
+    $id_publicacion = $data['env_id_publicacion'];
+    $id_solicitante = $data['env_id_solicitante'];
+    $id_postulante = $data['env_id_postulante'];
 } else {
     die("No se encontró la publicación para el ID de envío: " . htmlspecialchars($id_envio));
 }
 
 // Obtener el nombre del solicitante
 
-$sql_nombre = "SELECT nombre FROM usuarios WHERE id_usuario = ?";
+$sql_nombre = "SELECT u_nombre FROM usuario WHERE u_id = ?";
 $stmt_nombre = $conn->prepare($sql_nombre);
-$stmt_nombre->bind_param("s", $id_solicitante);
+$stmt_nombre->bind_param("i", $id_solicitante);
 $stmt_nombre->execute();
 $result_nombre = $stmt_nombre->get_result();
-$nombre_solicitante = $result_nombre->fetch_assoc()['nombre'];
+$nombre_solicitante = $result_nombre->fetch_assoc()['u_nombre'];
 
 // Mostrar el formulario
 ?>
@@ -168,7 +169,7 @@ $nombre_solicitante = $result_nombre->fetch_assoc()['nombre'];
         </div>
         <p><strong>Nombre del solicitante:</strong> <?php echo htmlspecialchars($nombre_solicitante); ?></p>
         
-        <form action="procesar_calificacionaS.php" method="POST" ><!-- onsubmit="return validarComentario()" -->
+        <form action="procesar_calificacionSVD.php" method="POST" ><!-- onsubmit="return validarComentario()" -->
         <input type="hidden" name="id_envio" value="<?php echo $id_envio; ?>">
         <input type="hidden" name="id_solicitante" value="<?php echo $id_solicitante; ?>">
         <input type="hidden" name="id_postulante" value="<?php echo $id_postulante; ?>">
