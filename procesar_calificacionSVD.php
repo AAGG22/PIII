@@ -3,10 +3,11 @@ session_start();
 var_dump($_SESSION); // Esto te mostrará si las variables existen
 
 // Conectar a la base de datos
-$host = "localhost";  // Servidor de la base de datos
-$dbname = "calificacion";  // Nombre de la base de datos
-$username = "user_vuelos";  // Usuario de la base de datos
-$password = "030817Fs";  // Contraseña de la base de datos
+
+$host = 'localhost';
+$dbname = 'verydeli_verydeli';
+$username = 'root'; 
+$password = '';
 
 // Crear conexión
 $conn = new mysqli($host, $username, $password, $dbname);
@@ -24,7 +25,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     // Capturar si se presionó el botón "Omitir"
     $calificacion = isset($_POST['omitir']) ? 0 : (int)$_POST['rating'];
-    //$calificacion = isset($_POST['rating']) ? (int)$_POST['rating'] : 0;
     $comentario = isset($_POST['comentario']) ? trim($_POST['comentario']) : '';
     $id_solicitante = isset($_POST['id_solicitante']) ? trim($_POST['id_solicitante']) : '';
     // Obtener el ID del envío
@@ -44,11 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Insertar los datos en la base de datos
-    $sql = "INSERT INTO calificacion_asolicitante (id_envio, calificacion, comentario, id_solicitante) VALUES (?, ?, ?, ?)";
+    $sql = "INSERT INTO calificacion (ca_id_envio, ca_puntaje, ca_comentario, ca_calificado) VALUES (?, ?, ?, ?)";
     // Preparar la consulta
     $stmt = $conn->prepare($sql);
 
-    $stmt->bind_param("iiss", $id_envio, $calificacion, $comentario, $id_solicitante);
+    $stmt->bind_param("iisi", $id_envio, $calificacion, $comentario, $id_solicitante);
 
     // Ejecutar la consulta
     if ($stmt->execute()) {
@@ -56,23 +56,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // **Obtener las últimas calificaciones del solicitante**
         $sql_calificaciones = "
-            SELECT calificacion 
-            FROM calificacion_asolicitante  
-            WHERE id_solicitante = ? AND calificacion > 0  -- Solo calificaciones mayores que 0--
-            ORDER BY fecha DESC 
+            SELECT ca_puntaje 
+            FROM calificacion  
+            WHERE ca_calificado = ? AND ca_puntaje > 0  -- Solo calificaciones mayores que 0--
+            ORDER BY ca_fecha DESC 
             LIMIT 5";
             /* WHERE id_solicitante = ? 
             AND (calificacion > 0 OR (calificacion = 0 AND contado_negativo = 0)) -- Excluir ya contabilizadas-- */
         $stmt_calificaciones = $conn->prepare($sql_calificaciones);
-        $stmt_calificaciones->bind_param("s", $id_solicitante);
+        $stmt_calificaciones->bind_param("i", $id_solicitante);
         $stmt_calificaciones->execute();
         $result_calificaciones = $stmt_calificaciones->get_result();//toma los resultados de la consulta(get_result)
 
         $calificaciones = [];
         while ($row = $result_calificaciones->fetch_assoc()) {
-           // if ($row['calificacion'] > 0) {  // Ignorar los ceros
-            $calificaciones[] = $row['calificacion'];
-            //}
+            $calificaciones[] = $row['ca_puntaje'];
+            
         }
 
     // Calcular promedio de calificaciones del solicitante
@@ -104,9 +103,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // **Actualizar estado de responsabilidad del usuario**
         //var_dump($id_usuario);
-        $sql_update = "UPDATE usuarios SET responsable = ? WHERE id_usuario = ?";
+        $sql_update = "UPDATE usuario SET u_responsable = ? WHERE u_id = ?";
         $stmt_update = $conn->prepare($sql_update);
-        $stmt_update->bind_param("is", $responsable, $id_usuario);
+        $stmt_update->bind_param("ii", $responsable, $id_usuario);
         if ($stmt_update->execute()) {
             echo "Estado de responsabilidad actualizado correctamente.";
         } else {
@@ -121,10 +120,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Consulta para obtener los id_solicitante de envios sin calificación
         $sql_penalizar = "
-            SELECT e.id_solicitante  
+            SELECT e.env_id_solicitante  
             FROM envio e 
-            LEFT JOIN calificacion_asolicitante c ON e.id_envio = c.id_envio
-            WHERE e.fecha_envio <= ? AND (c.calificacion = 0 AND c.contado_negativo = 0)
+            LEFT JOIN calificacion c ON e.env_id_envio = c.ca_id_envio
+            WHERE e.env_fecha_envio <= ? AND (c.ca_puntaje = 0 AND c.ca_contado_negativo = 0)
         ";// Solo contabiliza las que no han sido contabilizadas 
 
         //WHERE e.fecha_envio <= ? AND c.id_envio IS NULL
@@ -136,17 +135,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($resultado_penalizar->num_rows > 0) {
             while ($row = $resultado_penalizar->fetch_assoc()) {
                 // Obtener id_solicitante del resultado
-                $id_solicitante = $row['id_solicitante'];
+                $id_solicitante = $row['env_id_solicitante'];
                 echo "Penalizando al solicitante con ID: $id_solicitante<br>";
                  //-----------------------------------------------------------
-                // **Actualizar contado_negativo en calificacion_asolicitante para la calificación de 0**
+                // **Actualizar contado_negativo en calificacion para la calificación de 0**
                  $sql_actualizar_contado = "
-                    UPDATE calificacion_asolicitante 
-                    SET contado_negativo = 1 
-                    WHERE id_solicitante = ? AND (calificacion = 0 AND contado_negativo = 0)
+                    UPDATE calificacion 
+                    SET ca_contado_negativo = 1 
+                    WHERE ca_calificado = ? AND (ca_punatje = 0 AND ca_contado_negativo = 0)
                 ";
                 $stmt_actualizar_contado = $conn->prepare($sql_actualizar_contado);
-                $stmt_actualizar_contado->bind_param("s", $id_solicitante);
+                $stmt_actualizar_contado->bind_param("i", $id_solicitante);
                 $stmt_actualizar_contado->execute();
                 //------------------------------------------------------------------
 
@@ -155,34 +154,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                 // Actualizar las calificaciones negativas para el usuario encontrado
                 $sql_update_negativas = "
-                    UPDATE usuarios 
-                    SET calificaciones_negativas = calificaciones_negativas + 1 
-                    WHERE id_usuario = ?
+                    UPDATE usuario 
+                    SET u_calificaciones_negativas = u_calificaciones_negativas + 1 
+                    WHERE u_id = ?
                 ";
                 $stmt_update_negativas = $conn->prepare($sql_update_negativas);
-                $stmt_update_negativas->bind_param("s", $id_usuario);
+                $stmt_update_negativas->bind_param("i", $id_usuario);
                 $stmt_update_negativas->execute();
 
                 
                 // Verificar si el usuario pierde la responsabilidad
                 $sql_verificar_responsable = "
-                    SELECT calificaciones_negativas 
-                    FROM usuarios 
-                    WHERE id_usuario = ?
+                    SELECT u_calificaciones_negativas 
+                    FROM usuario 
+                    WHERE u_id = ?
                 ";
                 $stmt_verificar = $conn->prepare($sql_verificar_responsable);
-                $stmt_verificar->bind_param("s", $id_usuario);
+                $stmt_verificar->bind_param("i", $id_usuario);
                 $stmt_verificar->execute();
                 $res_negativas = $stmt_verificar->get_result()->fetch_assoc();
 
-                if ($res_negativas['calificaciones_negativas'] >= 2) {
+                if ($res_negativas['u_calificaciones_negativas'] >= 2) {
                     $sql_perder_responsabilidad = "
-                        UPDATE usuarios 
-                        SET responsable = 0 
-                        WHERE id_usuario = ?
+                        UPDATE usuario 
+                        SET u_responsable = 0 
+                        WHERE u_id = ?
                     ";
                     $stmt_perder_responsabilidad = $conn->prepare($sql_perder_responsabilidad);
-                    $stmt_perder_responsabilidad->bind_param("s", $id_usuario);
+                    $stmt_perder_responsabilidad->bind_param("i", $id_usuario);
                     $stmt_perder_responsabilidad->execute();
                 }
             }
