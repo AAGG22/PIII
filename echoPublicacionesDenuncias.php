@@ -4,10 +4,8 @@
     $offset = ($paginaActual - 1) * $publicacionesPorPagina;
 
     // Consulta SQL con límite y desplazamiento para obtener las publicaciones de la página actual
-    $sqlPublicaciones = "SELECT * FROM denuncias LIMIT :offset, :limit";
+    $sqlPublicaciones = "SELECT * FROM denuncias LIMIT $offset, $publicacionesPorPagina";
     $stmtPublicaciones = $pdo->prepare($sqlPublicaciones);
-    $stmtPublicaciones->bindValue(':offset', $offset, PDO::PARAM_INT);
-    $stmtPublicaciones->bindValue(':limit', $publicacionesPorPagina, PDO::PARAM_INT);
     $stmtPublicaciones->execute();
     
     $resultadoCantidadPublicaciones = $stmtPublicaciones->fetchAll(PDO::FETCH_NUM);
@@ -24,11 +22,12 @@
         
         foreach ($resultadoDenuncias as $row) {
             if($row[5]!="descartada"){
-                
+
+
                 $sql = "SELECT * FROM publicacion WHERE pu_id=".$row[1];
                 $stmt = $pdo->prepare($sql);  // Preparar la consulta
-                $stmt->execute();  // Ejecutar con los parámetros
-
+                $stmt->execute();
+                $idDenuncia = $row[0];
                 $resultadoPublicacion = $stmt->fetchAll(PDO::FETCH_NUM);
                 if(count($resultadoPublicacion)>0){
                     foreach($resultadoPublicacion as $rowPubliacion){
@@ -36,27 +35,37 @@
                         $idPublicacion = $rowPubliacion[0];
                     }
                 }
-                $idDenuncia = $row[0];
+
+                $sql = "SELECT u_userName FROM usuario WHERE u_id=".$row[2];
+                $stmt = $pdo->prepare($sql);  // Preparar la consulta
+                $stmt->execute();  // Ejecutar con los parámetros
+                $resultadoNombre=$stmt->fetchAll(PDO::FETCH_NUM);
+                if(count($resultadoNombre)>0){
+                    foreach($resultadoNombre as $rowNombre){
+                        $nombreUsuario=$rowNombre[0];
+                    }
+                }
                 // Imprimir la denuncia
                 echo "
                 <div class='container'>
-                <div class='card d-flex flex-row ' style='height: 100%;'>
-                    <div class='card-body d-flex flex-column'>
-                        <div class='flex-grow-1'>
+                    <div class='card' style='height: 100%;'>
+                        <div class='card-header'>
                             <h5 class='card-title'>" . $nombrePublicacion . "</h5>
-                            <p class='card-text'></p>
-                            <p class='card-text'> Descripción: " . $row[4] . "</p>
-                            <p class='card-text'> Tags: " . $row[3] . "</p>
-                            <br><br>
                         </div>
-                        <div class='ms-auto'> 
-                            <a href='publicacion.php?publicacion=" . $row[1] . "&denuncia=" . $idDenuncia . "' class='btn btn-outline-info'>Ver Publicación</a>    
-                        </div>
-                        <div class='ms-auto'> 
-                            <a href='descartarDenuncia.php?denuncia=".$idDenuncia.",&publicacion=" . $row[1] . "' class='btn btn-outline-info'>Descartar</a>    
+                        <div class='card-body'>
+                            <div class='flex-grow-1'>
+                                <p class='card-text'> Descripción: " . $row[4] . "</p>
+                                <p class='card-text'> Tags: " . $row[3] . "</p>
+                                <p class='card-text'> Denunciante: " . $nombreUsuario . "</p>
+                                <br>
+                            </div>
+                            <div class='ms-auto'> 
+                                <a href='publicacion.php?publicacion=" . $row[1] . "&denuncia=" . $idDenuncia . "' class='btn btn-outline-info'>Ver Publicación</a>    
+
+                                <a href='descartarDenuncia.php?denuncia=".$idDenuncia.",&publicacion=" . $row[1] . "' class='btn btn-outline-info'>Descartar</a>    
+                            </div>
                         </div>
                     </div>
-                </div>
                 </div>
                 ";
             }
@@ -71,14 +80,18 @@
     echo "<br>
         <div align='right'><nav aria-label='Page navigation example'>
         <ul class='pagination'>";
+
     if ($paginaActual > 1) {
-        echo "<li class='page-item'><a class='page-link' href=?pag=" . ($paginaActual - 1) . ">Anterior</a></li>";
+        echo "<li class='page-item'><a class='page-link' href='?pag=" . ($paginaActual - 1) . "'>Anterior</a></li>";
     }
+
     for ($i = 1; $i <= $totalPaginas; $i++) {
-        echo "<li class='page-item'><a class='page-link' href=?pag=" . $i . ">". $i . "</a></li>";
+        echo "<li class='page-item'><a class='page-link' href='?pag=" . $i . "'>" . $i . "</a></li>";
     }
+
     if ($paginaActual < $totalPaginas) {
-        echo "<li class='page-item'><a class='page-link' href=?pag=". ($paginaActual + 1) . ">Siguiente</a></li>";
+        echo "<li class='page-item'><a class='page-link' href='?pag=" . ($paginaActual + 1) . "'>Siguiente</a></li>";
     }
+
     echo "</ul></nav></div>";
 ?>

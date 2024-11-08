@@ -14,7 +14,7 @@
     <?php
         include 'cabecera.html';
     ?>
-
+    <br><br>
     <!--Publicaciones-->
     <?php
         include 'coneccion/conexionPDO.php';
