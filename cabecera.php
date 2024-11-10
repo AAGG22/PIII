@@ -3,10 +3,10 @@
 
 include('conexion.php'); 
 include('header.php');
-
+session_start();
 
    
-$admin=include('modoAdmin.php');
+$admin='';
 
 // Inicializar variable para el avatar
 $avatar_url = 'Imagenes/avatarAbeja.jpg'; // URL por defecto si no hay avatar
@@ -52,10 +52,7 @@ if (isset($_SESSION['user_id'])) {
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
-            <form class="d-flex mx-auto col-md-4" role="buscar">
-                <input class="form-control me-2" type="search" placeholder="Buscar" aria-label="Search">
-                <button class="btn btn-light" type="submit">Buscar</button>
-            </form>
+            
 
             <?php 
             if($admin===true){
@@ -76,11 +73,14 @@ if (isset($_SESSION['user_id'])) {
             ?>
             
             <ul class="navbar-nav ms-auto">
-                <li class="nav-item">
-                    <a class="nav-link active text-white" aria-current="page" href="pag3_publicacion.php">Publicar</a>
+            <li class="nav-item">
+                    <a class="nav-link active text-white" aria-current="page" href="index.php">Inicio</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link active text-white" aria-current="page" href="Pag6_deposito.php">Postularse</a>
+                    <a class="nav-link active text-white" aria-current="page" href="crearPublicacion.php">Publicar</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active text-white" aria-current="page" href="misPublicaciones.php">Mis interacciones</a>
                 </li>
             </ul>
             <?php }?>
