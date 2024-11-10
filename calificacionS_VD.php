@@ -214,7 +214,7 @@ $nombre_solicitante = $result_nombre->fetch_assoc()['u_nombre'];
         </div>
         <p><strong>Nombre del solicitante:</strong> <?php echo htmlspecialchars($nombre_solicitante); ?></p>
         
-        <form action="procesar_calificacionaS.php" method="POST" ><!-- onsubmit="return validarComentario()" -->
+        <form action="procesar_calificacionSVD.php" method="POST" ><!-- onsubmit="return validarComentario()" -->
         <input type="hidden" name="id_envio" value="<?php echo $id_envio; ?>">
         <input type="hidden" name="id_solicitante" value="<?php echo $id_solicitante; ?>">
         <input type="hidden" name="id_postulante" value="<?php echo $id_postulante; ?>">
@@ -236,7 +236,7 @@ $nombre_solicitante = $result_nombre->fetch_assoc()['u_nombre'];
             <textarea name="comentario" id="comentario" rows="4" placeholder="Escribe tu comentario aquí..." ></textarea>
             <div class="error" id="error-message">Debes escribir al menos 2 palabras.</div>
         <input type="submit" value="Enviar calificación" style="font-family: Oregano, cursive;font-size: 20px;">
-        <input type="submit" value="Omitir por ahora" name="omitir" >Omitir por ahora</input>    <!-- onclick="window.location.href='publicaciones.php'" -->
+        <input type="submit" value="Omitir por ahora" name="omitir" ></input>    <!-- onclick="window.location.href='publicaciones.php'" -->
     </form>
     </article>
     
