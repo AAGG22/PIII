@@ -3,18 +3,15 @@ session_start();
 //var_dump($_SESSION); // Esto te mostrará si las variables existen
 
 // Conectar a la base de datos
-/* $host = "localhost";  // Servidor de la base de datos
-$dbname = "calificacion";  // Nombre de la base de datos
-$username = "user_vuelos";  // Usuario de la base de datos
-$password = "030817Fs";  // Contraseña de la base de datos
- */
+
 
 $host = 'localhost';
 $dbname = 'verydeli_verydeli';
-$username = "user_vuelos";
-$password = "030817Fs";
-/* $username = 'root'; 
-$password = ''; */
+$username = 'root'; 
+$password = '';
+/* $username = "user_vuelos";
+$password = "030817Fs"; */
+
 
 // Crear conexión
 $conn = new mysqli($host, $username, $password, $dbname);
@@ -28,10 +25,10 @@ if ($conn->connect_error) {
 $id_envio = isset($_GET['env_id_envio']) ? (int)$_GET['env_id_envio'] : 0;
 
 // Obtener el ID de solicitante
-$id_solicitante = isset($_SESSION['id_solicitante']) ? $_SESSION['id_solicitante'] : 0;
+//$id_solicitante = isset($_SESSION['id_solicitante']) ? $_SESSION['id_solicitante'] : 0;
 
-// Obtener el ID de publicación a partir del ID de envío
-$sql_publicacion = "SELECT env_id_publicacion, env_id_solicitante, env_id_postulante FROM envio WHERE env_id_envio = ?";
+// Paso1: Obtener el ID de publicación a partir del ID de envío
+$sql_publicacion = "SELECT env_id_publicacion FROM envio WHERE env_id_envio = ?";
 $stmt_publicacion = $conn->prepare($sql_publicacion);
 $stmt_publicacion->bind_param("i", $id_envio);
 $stmt_publicacion->execute();
@@ -40,21 +37,81 @@ $result_publicacion = $stmt_publicacion->get_result();
 if ($result_publicacion->num_rows > 0) {
     $data = $result_publicacion->fetch_assoc();
     $id_publicacion = $data['env_id_publicacion'];
-    $id_solicitante = $data['env_id_solicitante'];
-    $id_postulante = $data['env_id_postulante'];
+    /* $id_solicitante = $data['env_id_solicitante'];
+    $id_postulante = $data['env_id_postulante']; */
+
+    // Paso 2: Obtener el ID de solicitante desde la tabla `publicacion`
+    $sql_publicacion = "SELECT pu_fk_u_id FROM publicacion WHERE pu_id = ?";
+    $stmt_publicacion = $conn->prepare($sql_publicacion);
+    $stmt_publicacion->bind_param("i", $id_publicacion);
+    $stmt_publicacion->execute();
+    $result_publicacion = $stmt_publicacion->get_result();
+
+    if ($result_publicacion->num_rows > 0) {
+        $data_publicacion = $result_publicacion->fetch_assoc();
+        $id_solicitante = $data_publicacion['pu_fk_u_id'];
+
+        /* // Paso 3: Obtener el nombre del solicitante
+        $sql_solicitante = "SELECT u_nombre FROM usuario WHERE u_id = ?";
+        $stmt_solicitante = $conn->prepare($sql_solicitante);
+        $stmt_solicitante->bind_param("i", $id_solicitante);
+        $stmt_solicitante->execute();
+        $result_solicitante = $stmt_solicitante->get_result();
+
+        if ($result_solicitante->num_rows > 0) {
+            $data_solicitante = $result_solicitante->fetch_assoc();
+            $nombre_solicitante = $data_solicitante['u_nombre'];
+        } else {
+            die("No se encontró el solicitante con el ID: " . htmlspecialchars($id_solicitante));
+        } */
+
+    } else {
+        die("No se encontró el solicitante para el ID de publicación: " . htmlspecialchars($id_publicacion));
+    }
+
+    // Paso 3: Obtener el ID de postulante desde la tabla `postulacion`
+    $sql_postulacion = "SELECT po_fk_u_id FROM postulacion WHERE po_id = ? AND po_estado = 'elegido'";
+    $stmt_postulacion = $conn->prepare($sql_postulacion);
+    $stmt_postulacion->bind_param("i", $id_publicacion);
+    $stmt_postulacion->execute();
+    $result_postulacion = $stmt_postulacion->get_result();
+
+    if ($result_postulacion->num_rows > 0) {
+        $data_postulacion = $result_postulacion->fetch_assoc();
+        $id_postulante = $data_postulacion['po_fk_u_id'];
+        
+        // Paso 4: Obtener el nombre del postulante
+        $sql_postulante = "SELECT u_nombre FROM usuario WHERE u_id = ?";
+        $stmt_postulante = $conn->prepare($sql_postulante);
+        $stmt_postulante->bind_param("i", $id_postulante);
+        $stmt_postulante->execute();
+        $result_postulante = $stmt_postulante->get_result();
+
+        if ($result_solicitante->num_rows > 0) {
+            $data_postulante = $result_postulante->fetch_assoc();
+            $nombre_postulante = $data_postulante['u_nombre'];
+        } else {
+            die("No se encontró el postulante con el ID: " . htmlspecialchars($id_postulante));
+        }
+
+    } else {
+        die("No se encontró el postulante para el ID de publicación: " . htmlspecialchars($id_publicacion));
+    }
+
+
 } else {
     die("No se encontró la publicación para el ID de envío: " . htmlspecialchars($id_envio));
 }
 
 // Obtener el nombre del solicitante
 
-$sql_nombre = "SELECT u_nombre FROM usuario WHERE u_id = ?";
+/* $sql_nombre = "SELECT u_nombre FROM usuario WHERE u_id = ?";
 $stmt_nombre = $conn->prepare($sql_nombre);
 $stmt_nombre->bind_param("i", $id_postulante);
 $stmt_nombre->execute();
 $result_nombre = $stmt_nombre->get_result();
 $nombre_postulante = $result_nombre->fetch_assoc()['u_nombre'];
-
+ */
 // Mostrar el formulario
 ?>
 <!DOCTYPE html>
@@ -74,6 +131,7 @@ $nombre_postulante = $result_nombre->fetch_assoc()['u_nombre'];
         header {
             text-align: center;
             background-color: #007bff;
+            background: linear-gradient(to right, #615778, #B3A1DE);
             color: white;
             padding: 20px;
         }
@@ -82,6 +140,7 @@ $nombre_postulante = $result_nombre->fetch_assoc()['u_nombre'];
             padding: 20px;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(128, 0, 128, 0.5);  /* Sombra púrpura */
             max-width: 600px;
             margin: 20px auto; /* Centra horizontalmente el article */
             text-align: center; /* Centra el contenido dentro del article */
@@ -167,7 +226,7 @@ $nombre_postulante = $result_nombre->fetch_assoc()['u_nombre'];
         </div>
         <p><strong>Nombre del empleado:</strong>  <?php echo htmlspecialchars($nombre_postulante); ?></p></p>
         
-        <form action="procesar_calificacionaP.php" method="POST" ><!-- onsubmit="return validarComentario()" -->
+        <form action="procesar_calificacionPVD.php" method="POST" ><!-- onsubmit="return validarComentario()" -->
         <input type="hidden" name="id_envio" value="<?php echo $id_envio; ?>">
         <input type="hidden" name="id_solicitante" value="<?php echo $id_solicitante; ?>">
         <input type="hidden" name="id_postulante" value="<?php echo $id_postulante; ?>">
@@ -189,7 +248,7 @@ $nombre_postulante = $result_nombre->fetch_assoc()['u_nombre'];
             <textarea name="comentario" id="comentario" rows="4" placeholder="Escribe tu comentario aquí..." ></textarea>
             <div class="error" id="error-message">Debes escribir al menos 2 palabras.</div>
             <input type="submit" value="Enviar calificación">
-            <input type="submit" value="Omitir por ahora" name="omitir" >Omitir por ahora</input>    <!-- onclick="window.location.href='publicaciones.php'" -->
+            <input type="submit" value="Omitir por ahora" name="omitir" ></input>    <!-- onclick="window.location.href='publicaciones.php'" -->
         </form>
     </article>
     
