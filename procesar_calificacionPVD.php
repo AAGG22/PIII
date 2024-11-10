@@ -194,7 +194,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         } else {
             echo "No se encontraron envíos sin calificación.";
         }
-
+        header('Location: index.php');
     } else {
         echo "Error al guardar la calificación: " . $conn->error;
     }
