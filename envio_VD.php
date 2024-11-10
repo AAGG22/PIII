@@ -43,27 +43,43 @@ if (isset($_GET['publicacion_id'])) {
     $result = $stmt->get_result();
 
     if ($result->num_rows > 0) {
+        
         $publicacion = $result->fetch_assoc();
-        echo "<h1>Detalles de la Publicación</h1>";
-        echo "<p>Origen: " . htmlspecialchars($publicacion['pu_fk_origen']) . "</p>";
-        echo "<p>Destino: " . htmlspecialchars($publicacion['pu_fk_destino']) . "</p>";
-        echo "<p>Descripción: " . htmlspecialchars($publicacion['pu_descripcion']) . "</p>";
-        echo "<p>Volumen: " . htmlspecialchars($publicacion['pu_volumen']) . "</p>";
-        echo "<p>Peso: " . htmlspecialchars($publicacion['pu_peso']) . "</p>";
+        $stmt_origen = $pdo->prepare("SELECT provincia FROM argentina WHERE arg_id = :origen_id");
+        $stmt_origen->bindParam(':origen_id', $publicacion['pu_fk_origen_provincia'], PDO::PARAM_INT);
+        $stmt_origen->execute();
+        $origen = $stmt_origen->fetchColumn();
+        
+        $stmt_destino = $pdo->prepare("SELECT provincia FROM argentina WHERE arg_id = :destino_id");
+        $stmt_destino->bindParam(':destino_id', $publicacion['pu_fk_destino_provincia'], PDO::PARAM_INT);
+        $stmt_destino->execute();
+        $destino = $stmt_destino->fetchColumn();
+        
+        echo "<div class='card'>";
+        echo "<h5 class='card-header'>Detalles de la Publicación</h5>";
+        echo "<div class='card-body'>";
+        echo "<p class='card-text'>Origen: " . $origen . " - ". htmlspecialchars($publicacion['pu_fk_origen_ciudad'])." - ". htmlspecialchars($publicacion['pu_fk_origen_direccion']) ." </p>";
+        echo "<p class='card-text'>Destino: " . $destino . " - ". htmlspecialchars($publicacion['pu_fk_destino_ciudad'])." - ". htmlspecialchars($publicacion['pu_fk_destino_direccion']) ."</p>";
+        echo "<p class='card-text'>Descripción: " . htmlspecialchars($publicacion['pu_descripcion']) . "</p>";
+        echo "<p class='card-text'>Destinatario: " . htmlspecialchars($publicacion['pu_nombre_contacto'])."</p>";
+        echo "<p class='card-text'> Numero de contacto: ".htmlspecialchars($publicacion['pu_contacto_destino'])."</p>";
+        echo "<p class='card-text'>Volumen: " . htmlspecialchars($publicacion['pu_volumen']) . " cm3</p>";
+        echo "<p class='card-text'>Peso: " . htmlspecialchars($publicacion['pu_peso']) . " kg</p>";
 
         // Formulario para marcar como "Retirado"
         echo '<form action="" method="post">';
         echo '<input type="hidden" name="id_publicacion" value="' . htmlspecialchars($id_publicacion) . '">';
         echo '<input type="hidden" name="accion" value="retirado">';
-        echo '<input type="submit" value="Retirado">';
+        echo '<input class="btn btn-outline-info" type="submit" value="Retirado">';
         echo '</form>';
 
         // Formulario para marcar como "Entregado"
         echo '<form action="" method="post">';
         echo '<input type="hidden" name="id_publicacion" value="' . htmlspecialchars($id_publicacion) . '">';
         echo '<input type="hidden" name="accion" value="entregado">';
-        echo '<input type="submit" value="Entregado">';
+        echo '<input class="btn btn-outline-info" type="submit" value="Entregado">';
         echo '</form>';
+        echo '</div></div>';
     } else {
         echo "No se encontró la publicación.";
     }
@@ -81,6 +97,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_publicacion'])) {
     //$id_postulante = $_SESSION['user_id'];
 
     // Obtener el id del solicitante basado en el id_publicacion
+    
     //$id_solicitante = obtenerIdSolicitante($id_publicacion, $conn);
 
     if ($accion === 'retirado') {
@@ -136,7 +153,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_publicacion'])) {
             $stmt_envio->bind_param("i", $id_publicacion);
             $stmt_envio->execute();
             $result_envio = $stmt_envio->get_result();
-
+            
+            //actualizo el estado de la publicacion
+    
+            $sql_envioPublicacion = "UPDATE publicacion SET pu_estado = :estado WHERE pu_id = :id";
+            $stmt_envioPublicacion = $pdo->prepare($sql_envioPublicacion);
+            $stmt_envioPublicacion->bindParam(':estado', $estado);
+            $stmt_envioPublicacion->bindParam(':id', $id_publicacion, PDO::PARAM_INT);
+            
+            $estado = 'finalizada';
+            $id_publicacion = $id_publicacion;
+            
+            $stmt_envioPublicacion->execute();
             if ($result_envio->num_rows > 0) {
                 $envio = $result_envio->fetch_assoc();
                 $id_envio = $envio['env_id_envio'];
@@ -182,4 +210,3 @@ function obtenerIdSolicitante($id_publicacion, $conn) {
 // Cerrar conexión
 $conn->close();
 ?>
-
