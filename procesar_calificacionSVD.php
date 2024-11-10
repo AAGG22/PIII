@@ -44,11 +44,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // Insertar los datos en la base de datos
-    $sql = "INSERT INTO calificacion (ca_id_envio, ca_puntaje, ca_comentario, ca_calificado) VALUES (?, ?, ?, ?)";
+   $sql = "INSERT INTO calificacion (ca_id_envio, ca_puntaje, ca_comentario, ca_calificado, ca_califica) VALUES (?, ?, ?, ?, ?)";
     // Preparar la consulta
     $stmt = $conn->prepare($sql);
 
-    $stmt->bind_param("iisi", $id_envio, $calificacion, $comentario, $id_solicitante);
+    $stmt->bind_param("iisii", $id_envio, $calificacion, $comentario, $id_solicitante, $id_postulante);
 
     // Ejecutar la consulta
     if ($stmt->execute()) {
