@@ -3,18 +3,11 @@ session_start();
 var_dump($_SESSION); // Esto te mostrará si las variables existen
 
 // Conectar a la base de datos
-/* $host = "localhost";  // Servidor de la base de datos
-$dbname = "calificacion";  // Nombre de la base de datos
-$username = "user_vuelos";  // Usuario de la base de datos
-$password = "030817Fs";  // Contraseña de la base de datos
- */
 
 $host = 'localhost';
 $dbname = 'verydeli_verydeli';
-$username = "user_vuelos";
-$password = "030817Fs";
-/* $username = 'root'; 
-$password = ''; */
+$username = 'root'; 
+$password = '';
 
 // Crear conexión
 $conn = new mysqli($host, $username, $password, $dbname);
@@ -65,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql_calificaciones = "
             SELECT ca_puntaje 
             FROM calificacion 
-            WHERE ca_Calificado = ? AND ca_puntaje > 0  -- Solo calificaciones mayores que 0--
+            WHERE ca_calificado = ? AND ca_puntaje > 0  -- Solo calificaciones mayores que 0--
             ORDER BY ca_fecha DESC 
             LIMIT 5";
             
@@ -127,7 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Consulta para obtener los id_solicitante de envios sin calificación
         $sql_penalizar = "
-            SELECT e.env_id_postulante  
+            SELECT e.env_id_envio, c.ca_calificado  
             FROM envio e 
             LEFT JOIN calificacion c ON e.env_id_envio = c.ca_id_envio
             WHERE e.env_fecha_envio <= ? AND (c.ca_puntaje = 0 AND c.ca_contado_negativo = 0)
@@ -142,17 +135,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($resultado_penalizar->num_rows > 0) {
             while ($row = $resultado_penalizar->fetch_assoc()) {
                 // Obtener id_postulante del resultado
-                $id_postulante = $row['env_id_postulante'];
+                /* $id_postulante = $row['env_id_postulante'];
                 echo "Penalizando al postulante con ID: $id_postulante<br>";
-                 //-----------------------------------------------------------
+                 */
+                // Obtener id_envio y id_postulante del resultado
+                $id_envio = $row['env_id_envio'];
+                $id_postulante = $row['ca_calificado'];
+                echo "Penalizando al postulante con ID: $id_postulante<br>";
+                
+                //-----------------------------------------------------------
                 // **Actualizar contado_negativo en calificacion_asolicitante para la calificación de 0**
                  $sql_actualizar_contado = "
                     UPDATE calificacion 
                     SET ca_contado_negativo = 1 
-                    WHERE ca_calificado = ? AND (ca_puntaje = 0 AND ca_contado_negativo = 0)
+                    WHERE ca_id_envio = ? AND (ca_puntaje = 0 AND ca_contado_negativo = 0)
                 ";
                 $stmt_actualizar_contado = $conn->prepare($sql_actualizar_contado);
-                $stmt_actualizar_contado->bind_param("s", $id_postulante);
+                $stmt_actualizar_contado->bind_param("i", $id_envio);
                 $stmt_actualizar_contado->execute();
                 //------------------------------------------------------------------
 
