@@ -8,8 +8,8 @@ session_start();
 
 $host = 'localhost';
 $dbname = 'verydeli_verydeli';
-$username = 'root'; 
-$password = '';
+$username = 'verydeli_tecnicaturaRedes'; 
+$password = 'verydel11';
 
 // Crear conexión
 $conn = new mysqli($host, $username, $password, $dbname);
