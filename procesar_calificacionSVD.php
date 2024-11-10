@@ -58,11 +58,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $sql_calificaciones = "
             SELECT ca_puntaje 
             FROM calificacion  
-            WHERE ca_calificado = ? AND ca_puntaje > 0  -- Solo calificaciones mayores que 0--
+            WHERE ca_calificado = ? AND ca_puntaje > 0  /* -- Solo calificaciones mayores que 0-- */
             ORDER BY ca_fecha DESC 
             LIMIT 5";
-            /* WHERE id_solicitante = ? 
-            AND (calificacion > 0 OR (calificacion = 0 AND contado_negativo = 0)) -- Excluir ya contabilizadas-- */
         $stmt_calificaciones = $conn->prepare($sql_calificaciones);
         $stmt_calificaciones->bind_param("i", $id_solicitante);
         $stmt_calificaciones->execute();
@@ -120,7 +118,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Consulta para obtener los id_solicitante de envios sin calificación
         $sql_penalizar = "
-            SELECT e.env_id_solicitante  
+            SELECT e.env_id_envio, c.ca_calificado 
             FROM envio e 
             LEFT JOIN calificacion c ON e.env_id_envio = c.ca_id_envio
             WHERE e.env_fecha_envio <= ? AND (c.ca_puntaje = 0 AND c.ca_contado_negativo = 0)
@@ -135,17 +133,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($resultado_penalizar->num_rows > 0) {
             while ($row = $resultado_penalizar->fetch_assoc()) {
                 // Obtener id_solicitante del resultado
-                $id_solicitante = $row['env_id_solicitante'];
+                /* $id_solicitante = $row['env_id_solicitante'];
                 echo "Penalizando al solicitante con ID: $id_solicitante<br>";
-                 //-----------------------------------------------------------
+                  */
+                // Obtener id_envio y id_solicitante del resultado
+                $id_envio = $row['env_id_envio'];
+                $id_solicitante = $row['ca_calificado'];
+                echo "Penalizando al solicitante con ID: $id_solicitante<br>";
+                //-----------------------------------------------------------
                 // **Actualizar contado_negativo en calificacion para la calificación de 0**
                  $sql_actualizar_contado = "
                     UPDATE calificacion 
                     SET ca_contado_negativo = 1 
-                    WHERE ca_calificado = ? AND (ca_punatje = 0 AND ca_contado_negativo = 0)
+                    WHERE ca_id_envio = ? AND (ca_puntaje = 0 AND ca_contado_negativo = 0)
                 ";
                 $stmt_actualizar_contado = $conn->prepare($sql_actualizar_contado);
-                $stmt_actualizar_contado->bind_param("i", $id_solicitante);
+                $stmt_actualizar_contado->bind_param("i", $id_envio);
                 $stmt_actualizar_contado->execute();
                 //------------------------------------------------------------------
 
