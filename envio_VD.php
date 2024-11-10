@@ -13,8 +13,8 @@ if (!isset($_SESSION['user_id'])) {
 
 $host = 'localhost';
 $dbname = 'verydeli_verydeli';
-$username = 'root'; 
-$password = ''; 
+$username = 'verydeli_tecnicaturaRedes'; 
+$password = 'verydel11';
 
 $conn = new mysqli($host, $username, $password, $dbname);
 
