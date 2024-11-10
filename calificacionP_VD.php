@@ -7,8 +7,8 @@ session_start();
 
 $host = 'localhost';
 $dbname = 'verydeli_verydeli';
-$username = 'root'; 
-$password = '';
+$username = 'verydeli_tecnicaturaRedes'; 
+$password = 'verydel11';
 /* $username = "user_vuelos";
 $password = "030817Fs"; */
 
