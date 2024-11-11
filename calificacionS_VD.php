@@ -118,21 +118,21 @@ if ($result_envio->num_rows > 0) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Calificación a solicitante</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Oregano:ital@0;1&display=swap');
+        
+        @import url('https://fonts.googleapis.com/css2?family=Oregano&family=Zilla+Slab:wght@400;500;600;700&display=swap');
         body {
             font-family: Arial, sans-serif;
-            font-family: "Oregano", cursive;
-            font-size: 20px;
+            font-family: "Zilla Slab", serif;/*cambio*/
             margin: 0;
             padding: 20px;
             background-color: #f4f4f4;
-            
+            background: linear-gradient(to bottom, #e7fffb,#dddddd,#cac9c9);/*cambio*/
         }
         header {
             text-align: center;
-            background-color: #615778;
-            background: linear-gradient(#e66465, #9198e5);
+            background-color: #007bff;
             background: linear-gradient(to right, #615778, #B3A1DE);
+            background: linear-gradient(to right, #6e5976, #9780a0);/*cambio*/
             color: white;
             padding: 20px;
         }
@@ -178,12 +178,14 @@ if ($result_envio->num_rows > 0) {
             border-radius: 5px;
             border: 1px solid #ccc;
             font-size: 16px;
+            font-family: "Zilla Slab", serif;/*cambio*/
         }
         input[type="submit"] {
             display: block;
             width: 100%;
             background-color: #007bff;
             background: linear-gradient(to right, #615778, #B3A1DE);
+            background: linear-gradient(to right, #6e5976, #9780a0);/*cambio*/
             color: white;
             padding: 15px;
             border: none;
@@ -191,6 +193,7 @@ if ($result_envio->num_rows > 0) {
             font-size: 18px;
             cursor: pointer;
             margin-top: 20px;
+            font-family: "Zilla Slab", serif;/*cambio*/
         }
         .contenedor-imagen {
             position: relative; /* Hace que el contenedor sea el punto de referencia para el vehículo */
@@ -204,7 +207,7 @@ if ($result_envio->num_rows > 0) {
             position: absolute;
             bottom: -20px; /* Posiciona la imagen en la parte inferior */
             right: -35px;  /* Posiciona la imagen en la esquina derecha */
-            max-width: 105px;
+            max-width: 120px;
             border-radius: 50%; /* Hace la imagen del vehículo circular, si lo prefieres */
         }
         .error {
