@@ -54,7 +54,7 @@ if ($result_envio->num_rows > 0) {
     }
 
     // Paso 3: Obtener el ID de postulante desde la tabla `postulacion`
-    $sql_postulacion = "SELECT po_fk_u_id FROM postulacion WHERE po_id = ? AND po_estado = 'elegido'";
+    $sql_postulacion = "SELECT po_fk_u_id FROM postulacion WHERE po_fk_pu_id = ? AND po_estado = 'elegido'";
     $stmt_postulacion = $conn->prepare($sql_postulacion);
     $stmt_postulacion->bind_param("i", $id_publicacion);
     $stmt_postulacion->execute();
@@ -64,6 +64,16 @@ if ($result_envio->num_rows > 0) {
         $data_postulacion = $result_postulacion->fetch_assoc();
         $id_postulante = $data_postulacion['po_fk_u_id'];
         
+        // Paso4: Obtener la foto del vehículo usando el id_usuario como u_id en la tabla `vehiculo`
+        $sql_vehiculo = "SELECT v_foto FROM vehiculo WHERE v_fk_u_id = ?";
+        $stmt_vehiculo = $conn->prepare($sql_vehiculo);
+        $stmt_vehiculo->bind_param("i", $id_postulante);
+        $stmt_vehiculo->execute();
+        $result_vehiculo = $stmt_vehiculo->get_result();
+        
+        if ($result_vehiculo->num_rows > 0) {
+            $vehiculo_foto_url = $result_vehiculo->fetch_assoc()['v_foto'];
+        }
         // Paso 4: Obtener el nombre del postulante
         $sql_postulante = "SELECT u_nombre, u_avatar, u_vehiculo FROM usuario WHERE u_id = ?";
         $stmt_postulante = $conn->prepare($sql_postulante);
@@ -87,14 +97,6 @@ if ($result_envio->num_rows > 0) {
         $stmt_avatar->execute();
         $result_avatar = $stmt_avatar->get_result();
         $avatar_url = $result_avatar->fetch_assoc()['a_url'];
-
-        // Obtener la URL de la foto del vehículo
-        $sql_vehiculo = "SELECT v_foto FROM vehiculo WHERE v_id = ?";
-        $stmt_vehiculo = $conn->prepare($sql_vehiculo);
-        $stmt_vehiculo->bind_param("i", $vehiculo_id);
-        $stmt_vehiculo->execute();
-        $result_vehiculo = $stmt_vehiculo->get_result();
-        $vehiculo_foto_url = $result_vehiculo->fetch_assoc()['v_foto'];
 
     } else {
         die("No se encontró el postulante para el ID de publicación: " . htmlspecialchars($id_publicacion));
