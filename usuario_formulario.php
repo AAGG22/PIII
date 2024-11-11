@@ -54,7 +54,7 @@ include('header.php');
                                     pattern="(?=.*[A-Z])(?=.*[0-9])(?=.*[!@#$%^&*]).{8,}">
                             </div>
                             <small>Requisitos:</small>
-                            <div id="password-requirements" style="font-size: 8px;">
+                            <div id="password-requirements" style="font-size: 10px;">
                                 <ul style="list-style-position: inside; padding-left: 0;">
                                     <li id="length" class="text-danger">Mínimo 8 caracteres</li>
                                     <li id="uppercase" class="text-danger">Al menos 1 mayúscula</li>
