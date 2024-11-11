@@ -1,6 +1,9 @@
+
 <?php
 // Incluir el archivo de conexión a la base de datos
 include 'conexion.php';
+include('header.php');
+
 
 session_start(); // Iniciar la sesión para almacenar los datos del usuario si es necesario
 
@@ -34,12 +37,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['username'] = $user['u_userName'];
                 
                 // Redirigir al usuario a la página principal o a un área privada
-                header("Location: pag5.php");
+                header("Location: index.php");
                 exit();
             } else {
                 // Contraseña incorrecta
                 //echo "<div class='alert alert-danger'>Contraseña incorrecta.</div>";
                 header("Location: pag2.php");
+                exit();
             }
         } else {
             // Usuario no encontrado

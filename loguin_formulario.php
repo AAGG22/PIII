@@ -32,8 +32,10 @@ include "cabecera.php";
                             Usuario: <input class="form-control" type="text" name="usuario" id="">
                             <br>
                             Contraseña: <input class="form-control" type="password" name="pwd" id="">
+                            <span><a href="recuperarContraseña.php">Olvidé mi contraseña</a></span>
                             <br>
                             <button class="btn btn-secondary" type="submit">Iniciar sesión</button>
+                            
                             <br><br>
                             <p class="text-body-secondary fw-light small text-center">
                                 ¿Aún no tienes una cuenta? <a href="usuario_formulario.php" class="text-reset">¡Regístrate ahora!</a>
