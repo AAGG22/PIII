@@ -11,6 +11,7 @@ $dbname = 'verydeli_verydeli';
 $username = 'verydeli_tecnicaturaRedes'; 
 $password = 'verydel11';
 
+
 // Crear conexión
 $conn = new mysqli($host, $username, $password, $dbname);
 
@@ -23,7 +24,6 @@ if ($conn->connect_error) {
 $id_envio = isset($_GET['env_id_envio']) ? (int)$_GET['env_id_envio'] : 0;
 
 // Obtener el ID de solicitante
-//$id_solicitante = isset($_SESSION['id_solicitante']) ? $_SESSION['id_solicitante'] : 0;
 
 //Paso1: Obtener el ID de publicación a partir del ID de envío
 $sql_envio = "SELECT env_id_publicacion FROM envio WHERE env_id_envio = ?";
@@ -35,10 +35,22 @@ $result_envio = $stmt_envio->get_result();
 if ($result_envio->num_rows > 0) {
     $data = $result_envio->fetch_assoc();
     $id_publicacion = $data['env_id_publicacion'];
-    /* $id_solicitante = $data['env_id_solicitante'];
-    $id_postulante = $data['env_id_postulante']; */
+     
+    //Paso 2:Obtener la foto del paquete desde la tabla `publicacion`
+    $sql_foto_paquete = "SELECT pu_foto FROM publicacion WHERE pu_id = ?";
+    $stmt_foto_paquete = $conn->prepare($sql_foto_paquete);
+    $stmt_foto_paquete->bind_param("i", $id_publicacion);
+    $stmt_foto_paquete->execute();
+    $result_foto_paquete = $stmt_foto_paquete->get_result();
 
-     // Paso 2: Obtener el ID de solicitante desde la tabla `publicacion`
+    if ($result_foto_paquete->num_rows > 0) {
+        $data_foto_paquete = $result_foto_paquete->fetch_assoc();
+        $foto_paquete_url = $data_foto_paquete['pu_foto'];
+    } else {
+        die("No se encontró la foto del paquete para el ID de publicación: " . htmlspecialchars($id_publicacion));
+    }
+
+     // Paso 3: Obtener el ID de solicitante desde la tabla `publicacion`
      $sql_publicacion = "SELECT pu_fk_u_id FROM publicacion WHERE pu_id = ?";
      $stmt_publicacion = $conn->prepare($sql_publicacion);
      $stmt_publicacion->bind_param("i", $id_publicacion);
@@ -48,9 +60,10 @@ if ($result_envio->num_rows > 0) {
      if ($result_publicacion->num_rows > 0) {
          $data_publicacion = $result_publicacion->fetch_assoc();
          $id_solicitante = $data_publicacion['pu_fk_u_id'];
- 
-         // Paso 3: Obtener el nombre del solicitante
-         $sql_solicitante = "SELECT u_nombre FROM usuario WHERE u_id = ?";
+        
+
+         // Paso 4: Obtener el nombre del solicitante
+         $sql_solicitante = "SELECT u_nombre, u_avatar FROM usuario WHERE u_id = ?";
          $stmt_solicitante = $conn->prepare($sql_solicitante);
          $stmt_solicitante->bind_param("i", $id_solicitante);
          $stmt_solicitante->execute();
@@ -59,15 +72,25 @@ if ($result_envio->num_rows > 0) {
          if ($result_solicitante->num_rows > 0) {
              $data_solicitante = $result_solicitante->fetch_assoc();
              $nombre_solicitante = $data_solicitante['u_nombre'];
+             $avatar_id = $data_solicitante['u_avatar'];
+
          } else {
              die("No se encontró el solicitante con el ID: " . htmlspecialchars($id_solicitante));
          }
- 
+
+         // Obtener la URL del avatar
+            $sql_avatar = "SELECT a_url FROM avatar WHERE a_id = ?";
+            $stmt_avatar = $conn->prepare($sql_avatar);
+            $stmt_avatar->bind_param("i", $avatar_id);
+            $stmt_avatar->execute();
+            $result_avatar = $stmt_avatar->get_result();
+            $avatar_url = $result_avatar->fetch_assoc()['a_url'];
+
      } else {
          die("No se encontró el solicitante para el ID de publicación: " . htmlspecialchars($id_publicacion));
      }
  
-     // Paso 4: Obtener el ID de postulante desde la tabla `postulacion`
+     // Paso 5: Obtener el ID de postulante desde la tabla `postulacion`
      $sql_postulacion = "SELECT po_fk_u_id FROM postulacion WHERE po_id = ? AND po_estado = 'elegido'";
      $stmt_postulacion = $conn->prepare($sql_postulacion);
      $stmt_postulacion->bind_param("i", $id_publicacion);
@@ -85,15 +108,6 @@ if ($result_envio->num_rows > 0) {
     die("No se encontró la publicación para el ID de envío: " . htmlspecialchars($id_envio));
 }
 
-// Obtener el nombre del solicitante
-
-/* $sql_nombre = "SELECT u_nombre FROM usuario WHERE u_id = ?";
-$stmt_nombre = $conn->prepare($sql_nombre);
-$stmt_nombre->bind_param("i", $id_solicitante);
-$stmt_nombre->execute();
-$result_nombre = $stmt_nombre->get_result();
-$nombre_solicitante = $result_nombre->fetch_assoc()['u_nombre'];
- */
 // Mostrar el formulario
 ?>
 
@@ -190,7 +204,7 @@ $nombre_solicitante = $result_nombre->fetch_assoc()['u_nombre'];
             position: absolute;
             bottom: -20px; /* Posiciona la imagen en la parte inferior */
             right: -35px;  /* Posiciona la imagen en la esquina derecha */
-            max-width: 120px;
+            max-width: 105px;
             border-radius: 50%; /* Hace la imagen del vehículo circular, si lo prefieres */
         }
         .error {
@@ -209,8 +223,10 @@ $nombre_solicitante = $result_nombre->fetch_assoc()['u_nombre'];
         <h2><span id="fecha-hora"></span></h2>
          <!-- Contenedor que agrupa las imágenes del postulante y del vehículo -->
          <div class="contenedor-imagen">
-            <img src="/imagenes/solicitante.jpg" alt="Imagen del empleado" class="imagen-postulante" />
-            <img src="/imagenes/paquete.jpg" alt="Transporte del delivery" class="imagen-vehiculo" />
+            <!-- Avatar del solicitante -->
+            <img src="<?php echo isset($avatar_url) ? htmlspecialchars($avatar_url) : '/Imagenes/user2.png'; ?>" alt="Imagen del solicitante" class="imagen-postulante" />
+            <!-- Foto del paquete -->
+            <img src="<?php echo isset($foto_paquete_url) ? htmlspecialchars($foto_paquete_url) : '/foto/paquet.png'; ?>" alt="Paquete llevado" class="imagen-vehiculo" />
         </div>
         <p><strong>Nombre del solicitante:</strong> <?php echo htmlspecialchars($nombre_solicitante); ?></p>
         
