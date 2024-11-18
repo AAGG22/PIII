@@ -54,6 +54,18 @@ if (isset($_GET['publicacion_id'])) {
         
         $publicacion = $result->fetch_assoc();
         
+         // Consulta para obtener el estado del envío
+        $stmt_estado = $conn->prepare("SELECT env_estado FROM envio WHERE env_id_publicacion = ?");
+        $stmt_estado->bind_param('i', $id_publicacion);
+        $stmt_estado->execute();
+        $estado_result = $stmt_estado->get_result();
+        
+        // Determinar el estado del envío
+        $estado_envio = '';
+        if ($estado_result->num_rows > 0) {
+            $estado_envio = $estado_result->fetch_assoc()['env_estado'];
+        }
+        
         /*$stmt_origen = $pdo->prepare("SELECT provincia FROM argentina WHERE arg_id = :origen_id");
         $stmt_origen->bindParam(':origen_id', $publicacion['pu_fk_origen_provincia'], PDO::PARAM_INT);
         $stmt_origen->execute();
@@ -88,33 +100,43 @@ if (isset($_GET['publicacion_id'])) {
         $telefono_result = $stmt_telefono->get_result();
         $telefono = $telefono_result->fetch_assoc()['u_telefono'];
         // *** FIN DEL CAMBIO ***
+        ?>
+        <div class="card">
+            <h5 class="card-header">Detalles de la Publicación</h5>
+            <div class="card-body">
+                <p class="card-text">Origen: <?php echo htmlspecialchars($origen) . " - " . htmlspecialchars($publicacion['pu_fk_origen_ciudad']) . " - " . htmlspecialchars($publicacion['pu_fk_origen_direccion']); ?></p>
+                <p class="card-text">Destino: <?php echo htmlspecialchars($destino) . " - " . htmlspecialchars($publicacion['pu_fk_destino_ciudad']) . " - " . htmlspecialchars($publicacion['pu_fk_destino_direccion']); ?></p>
+                <p class="card-text">Descripción: <?php echo htmlspecialchars($publicacion['pu_descripcion']); ?></p>
+                <p class="card-text">Contacto del remitente: <?php echo htmlspecialchars($telefono); ?></p>
+                <p class="card-text">Destinatario: <?php echo htmlspecialchars($publicacion['pu_nombre_contacto']); ?></p>
+                <p class="card-text">Número de contacto: <?php echo htmlspecialchars($publicacion['pu_contacto_destino']); ?></p>
+                <p class="card-text">Volumen: <?php echo htmlspecialchars($publicacion['pu_volumen']); ?> cm³</p>
+                <p class="card-text">Peso: <?php echo htmlspecialchars($publicacion['pu_peso']); ?> kg</p>
+
+                <?php
+                // Mostrar botones según el estado del envío
+                if ($estado_envio == 'pendiente') {
+                    // Si el estado es "retirado", mostrar el botón de "Entregado"
+                    echo '<form action="" method="post">
+                            <input type="hidden" name="id_publicacion" value="' . htmlspecialchars($id_publicacion) . '">
+                            <input type="hidden" name="accion" value="entregado">
+                            <input class="btn btn-outline-info" type="submit" value="Entregado">
+                          </form>';
+                } else {
+                    // Si el estado no es "retirado", mostrar el botón de "Retirado"
+                    echo '<form action="" method="post">
+                            <input type="hidden" name="id_publicacion" value="' . htmlspecialchars($id_publicacion) . '">
+                            <input type="hidden" name="accion" value="retirado">
+                            <input class="btn btn-outline-info" type="submit" value="Retirado">
+                          </form>';
+                }
+                ?>
+            </div>
+        </div>
+
+
         
-        echo "<div class='card'>";
-        echo "<h5 class='card-header'>Detalles de la Publicación</h5>";
-        echo "<div class='card-body'>";
-        echo "<p class='card-text'>Origen: " . $origen . " - ". htmlspecialchars($publicacion['pu_fk_origen_ciudad'])." - ". htmlspecialchars($publicacion['pu_fk_origen_direccion']) ." </p>";
-        echo "<p class='card-text'>Destino: " . $destino . " - ". htmlspecialchars($publicacion['pu_fk_destino_ciudad'])." - ". htmlspecialchars($publicacion['pu_fk_destino_direccion']) ."</p>";
-        echo "<p class='card-text'>Descripción: " . htmlspecialchars($publicacion['pu_descripcion']) . "</p>";
-        echo "<p class='card-text'>Contacto del remitente: " . htmlspecialchars($telefono) . "</p>";
-        echo "<p class='card-text'>Destinatario: " . htmlspecialchars($publicacion['pu_nombre_contacto'])."</p>";
-        echo "<p class='card-text'> Numero de contacto: ".htmlspecialchars($publicacion['pu_contacto_destino'])."</p>";
-        echo "<p class='card-text'>Volumen: " . htmlspecialchars($publicacion['pu_volumen']) . " cm3</p>";
-        echo "<p class='card-text'>Peso: " . htmlspecialchars($publicacion['pu_peso']) . " kg</p>";
-
-        // Formulario para marcar como "Retirado"
-        echo '<form action="" method="post">';
-        echo '<input type="hidden" name="id_publicacion" value="' . htmlspecialchars($id_publicacion) . '">';
-        echo '<input type="hidden" name="accion" value="retirado">';
-        echo '<input class="btn btn-outline-info" type="submit" value="Retirado">';
-        echo '</form>';
-
-        // Formulario para marcar como "Entregado"
-        echo '<form action="" method="post">';
-        echo '<input type="hidden" name="id_publicacion" value="' . htmlspecialchars($id_publicacion) . '">';
-        echo '<input type="hidden" name="accion" value="entregado">';
-        echo '<input class="btn btn-outline-info" type="submit" value="Entregado">';
-        echo '</form>';
-        echo '</div></div>';
+     <?php   
     } else {
         echo "No se encontró la publicación.";
     }
