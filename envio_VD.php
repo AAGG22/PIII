@@ -1,6 +1,14 @@
 <?php
+ob_start(); // Al inicio del archivo PHP
 
-session_start();
+/*ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);*/
+
+//session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 include "cabecera.php";
 
@@ -45,7 +53,8 @@ if (isset($_GET['publicacion_id'])) {
     if ($result->num_rows > 0) {
         
         $publicacion = $result->fetch_assoc();
-        $stmt_origen = $pdo->prepare("SELECT provincia FROM argentina WHERE arg_id = :origen_id");
+        
+        /*$stmt_origen = $pdo->prepare("SELECT provincia FROM argentina WHERE arg_id = :origen_id");
         $stmt_origen->bindParam(':origen_id', $publicacion['pu_fk_origen_provincia'], PDO::PARAM_INT);
         $stmt_origen->execute();
         $origen = $stmt_origen->fetchColumn();
@@ -55,12 +64,38 @@ if (isset($_GET['publicacion_id'])) {
         $stmt_destino->execute();
         $destino = $stmt_destino->fetchColumn();
         
+        $stmt_telefono = $pdo->prepare("SELECT u_telefono FROM usuario WHERE u_id = :u_id");
+        $stmt_telefono->bindParam(':u_id', $publicacion['pu_fk_u_id'], PDO::PARAM_INT);
+        $stmt_telefono->execute();
+        $telefono = $stmt_telefono->fetchColumn();*/
+        
+        // *** INICIO DEL CAMBIO ***
+        $stmt_origen = $conn->prepare("SELECT provincia FROM argentina WHERE arg_id = ?");
+        $stmt_origen->bind_param('i', $publicacion['pu_fk_origen_provincia']);
+        $stmt_origen->execute();
+        $origen_result = $stmt_origen->get_result();
+        $origen = $origen_result->fetch_assoc()['provincia'];
+
+        $stmt_destino = $conn->prepare("SELECT provincia FROM argentina WHERE arg_id = ?");
+        $stmt_destino->bind_param('i', $publicacion['pu_fk_destino_provincia']);
+        $stmt_destino->execute();
+        $destino_result = $stmt_destino->get_result();
+        $destino = $destino_result->fetch_assoc()['provincia'];
+
+        $stmt_telefono = $conn->prepare("SELECT u_telefono FROM usuario WHERE u_id = ?");
+        $stmt_telefono->bind_param('i', $publicacion['pu_fk_u_id']);
+        $stmt_telefono->execute();
+        $telefono_result = $stmt_telefono->get_result();
+        $telefono = $telefono_result->fetch_assoc()['u_telefono'];
+        // *** FIN DEL CAMBIO ***
+        
         echo "<div class='card'>";
         echo "<h5 class='card-header'>Detalles de la Publicación</h5>";
         echo "<div class='card-body'>";
         echo "<p class='card-text'>Origen: " . $origen . " - ". htmlspecialchars($publicacion['pu_fk_origen_ciudad'])." - ". htmlspecialchars($publicacion['pu_fk_origen_direccion']) ." </p>";
         echo "<p class='card-text'>Destino: " . $destino . " - ". htmlspecialchars($publicacion['pu_fk_destino_ciudad'])." - ". htmlspecialchars($publicacion['pu_fk_destino_direccion']) ."</p>";
         echo "<p class='card-text'>Descripción: " . htmlspecialchars($publicacion['pu_descripcion']) . "</p>";
+        echo "<p class='card-text'>Contacto del remitente: " . htmlspecialchars($telefono) . "</p>";
         echo "<p class='card-text'>Destinatario: " . htmlspecialchars($publicacion['pu_nombre_contacto'])."</p>";
         echo "<p class='card-text'> Numero de contacto: ".htmlspecialchars($publicacion['pu_contacto_destino'])."</p>";
         echo "<p class='card-text'>Volumen: " . htmlspecialchars($publicacion['pu_volumen']) . " cm3</p>";
@@ -156,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_publicacion'])) {
             
             //actualizo el estado de la publicacion
     
-            $sql_envioPublicacion = "UPDATE publicacion SET pu_estado = :estado WHERE pu_id = :id";
+            /*$sql_envioPublicacion = "UPDATE publicacion SET pu_estado = :estado WHERE pu_id = :id";
             $stmt_envioPublicacion = $pdo->prepare($sql_envioPublicacion);
             $stmt_envioPublicacion->bindParam(':estado', $estado);
             $stmt_envioPublicacion->bindParam(':id', $id_publicacion, PDO::PARAM_INT);
@@ -164,15 +199,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_publicacion'])) {
             $estado = 'finalizada';
             $id_publicacion = $id_publicacion;
             
-            $stmt_envioPublicacion->execute();
+            $stmt_envioPublicacion->execute();*/
+            
             if ($result_envio->num_rows > 0) {
                 $envio = $result_envio->fetch_assoc();
                 $id_envio = $envio['env_id_envio'];
-
-                // Redirigir a la página de calificación sin pasar id_solicitante en la URL
                 
-                header("Location: calificacionP_VD.php?env_id_envio=" . $id_envio);
-                header("Location: calificacionS_VD.php?env_id_envio=" . $id_envio);//agregue para dirigir a 2 paginas
+                // Actualizar estado de la publicación
+                $sql_envioPublicacion = "UPDATE publicacion SET pu_estado = 'finalizada' WHERE pu_id = ?";
+                $stmt_publicacion = $conn->prepare($sql_envioPublicacion);
+                $stmt_publicacion->bind_param("i", $id_publicacion);
+                $stmt_publicacion->execute();
+                
+                
+                // Verificar si los encabezados ya fueron enviados antes de la redirección
+                /*if (headers_sent($file, $line)) {
+                    die("Error: los encabezados ya fueron enviados en $file, línea $line");
+                }*/
+                
+                // Redirigir a la página de calificación sin pasar id_solicitante en la URL
+                header("Location: calificacionS_VD.php?env_id_envio=$id_envio");
                 exit;
             } else {
                 die("No se encontró el id_envio después de la actualización.");
@@ -209,4 +255,5 @@ function obtenerIdSolicitante($id_publicacion, $conn) {
 
 // Cerrar conexión
 $conn->close();
+ob_end_flush(); // Al final del archivo PHP
 ?>
